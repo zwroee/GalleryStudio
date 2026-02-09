@@ -15,7 +15,7 @@ export const updateGallerySchema = z.object({
     password: z.string().min(4).optional(),
     allow_downloads: z.boolean().optional(),
     allow_favorites: z.boolean().optional(),
-    cover_image_path: z.string().optional(),
+    cover_image_path: z.string().nullable().optional(),
 });
 
 // Auth validation schemas
