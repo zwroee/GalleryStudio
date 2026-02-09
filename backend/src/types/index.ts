@@ -58,10 +58,10 @@ export interface CreateGalleryRequest {
 export interface UpdateGalleryRequest {
     title?: string;
     description?: string;
-    password?: string;
+    password?: string | null;
     allow_downloads?: boolean;
     allow_favorites?: boolean;
-    expires_at?: string;
+    expires_at?: string | null;
     cover_image_path?: string | null;
 }
 
