@@ -1,13 +1,11 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 
-// Extend Fastify request type to include JWT payload
-declare module 'fastify' {
-    interface FastifyRequest {
-        user?: {
-            id: string;
-            username: string;
-        };
-    }
+interface FastifyRequest {
+    userData?: {
+        id: string;
+        username: string;
+    };
+}
 }
 
 // Authentication middleware for admin routes

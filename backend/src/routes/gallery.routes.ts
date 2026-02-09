@@ -40,9 +40,10 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
      * GET /api/galleries/:id
      * Get gallery by ID (admin only)
      */
-    fastify.get('/:id', { onRequest: [authenticate] }, async (request: FastifyRequest<{
+    interface GetGalleryRequest {
         Params: { id: string };
-    }>, reply: FastifyReply) => {
+    }
+    fastify.get<GetGalleryRequest>('/:id', { onRequest: [authenticate] }, async (request, reply) => {
         const gallery = await GalleryService.getGalleryById(request.params.id);
 
         if (!gallery) {
@@ -56,9 +57,10 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
      * GET /api/galleries/:id/emails
      * Get collected client emails for a gallery (admin only)
      */
-    fastify.get('/:id/emails', { onRequest: [authenticate] }, async (request: FastifyRequest<{
+    interface GetEmailsRequest {
         Params: { id: string };
-    }>, reply: FastifyReply) => {
+    }
+    fastify.get<GetEmailsRequest>('/:id/emails', { onRequest: [authenticate] }, async (request, reply) => {
         const galleryId = request.params.id;
 
         // Verify gallery exists
@@ -75,9 +77,11 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
      * PATCH /api/galleries/:id
      * Update gallery (admin only)
      */
-    fastify.patch('/:id', { onRequest: [authenticate] }, async (request: FastifyRequest<{
+    interface UpdateGalleryRouteRequest {
         Params: { id: string };
-    }>, reply: FastifyReply) => {
+        Body: UpdateGalleryRequest;
+    }
+    fastify.patch<UpdateGalleryRouteRequest>('/:id', { onRequest: [authenticate] }, async (request, reply) => {
         try {
             const data = validateBody(updateGallerySchema, request.body);
             const gallery = await GalleryService.updateGallery(request.params.id, data);
@@ -97,9 +101,10 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
      * DELETE /api/galleries/:id
      * Delete gallery (admin only)
      */
-    fastify.delete('/:id', { onRequest: [authenticate] }, async (request: FastifyRequest<{
+    interface DeleteGalleryRequest {
         Params: { id: string };
-    }>, reply: FastifyReply) => {
+    }
+    fastify.delete<DeleteGalleryRequest>('/:id', { onRequest: [authenticate] }, async (request, reply) => {
         const gallery = await GalleryService.getGalleryById(request.params.id, false);
 
         if (!gallery) {
@@ -119,9 +124,10 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
      * POST /api/galleries/:id/photos
      * Upload photos to gallery (admin only)
      */
-    fastify.post('/:id/photos', { onRequest: [authenticate] }, async (request: FastifyRequest<{
+    interface UploadPhotosRequest {
         Params: { id: string };
-    }>, reply: FastifyReply) => {
+    }
+    fastify.post<UploadPhotosRequest>('/:id/photos', { onRequest: [authenticate] }, async (request, reply) => {
         const galleryId = request.params.id;
 
         // Verify gallery exists
@@ -170,9 +176,10 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
      * DELETE /api/galleries/:galleryId/photos/:photoId
      * Delete photo from gallery (admin only)
      */
-    fastify.delete('/:galleryId/photos/:photoId', { onRequest: [authenticate] }, async (request: FastifyRequest<{
+    interface DeletePhotoRequest {
         Params: { galleryId: string; photoId: string };
-    }>, reply: FastifyReply) => {
+    }
+    fastify.delete<DeletePhotoRequest>('/:galleryId/photos/:photoId', { onRequest: [authenticate] }, async (request, reply) => {
         const { galleryId, photoId } = request.params;
 
         const photo = await GalleryService.getPhotoById(photoId);
