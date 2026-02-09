@@ -192,7 +192,7 @@ export default function AdminDashboard() {
                                         {gallery.cover_image_path ? (
                                             <div className="w-full h-48 bg-gray-100 mb-4 -mx-6 -mt-6 overflow-hidden">
                                                 <img
-                                                    src={gallery.cover_image_path}
+                                                    src={`/storage/${gallery.cover_image_path}`}
                                                     alt={gallery.title}
                                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                                 />

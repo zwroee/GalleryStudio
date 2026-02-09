@@ -23,7 +23,7 @@ export default function GallerySettingsModal({ onClose, onSave, gallery }: Galle
 
     // Cover Image State
     const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
-    const [coverPreview, setCoverPreview] = useState<string | null>(gallery.cover_image ?? null);
+    const [coverPreview, setCoverPreview] = useState<string | null>(gallery.cover_image_path ?? null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,16 +50,23 @@ export default function GallerySettingsModal({ onClose, onSave, gallery }: Galle
         // In a real app, we would upload the file here
         // For demo, we pass the preview URL/data back
         if (onSave) {
-            onSave({
-                ...gallery,
+            const updateData: any = {
                 title: formData.title,
                 description: formData.description || null,
-                password_hash: removePassword ? null : (formData.password ? 'hashed_new_password' : gallery.password_hash),
                 allow_downloads: formData.allow_downloads,
                 allow_favorites: formData.allow_favorites,
                 expires_at: formData.expires_at ? new Date(formData.expires_at).toISOString() : null,
                 cover_image_file: coverImageFile, // Pass file for upload
-            });
+            };
+
+            // Handle password update
+            if (removePassword) {
+                updateData.password = null;
+            } else if (formData.password) {
+                updateData.password = formData.password;
+            }
+
+            onSave(updateData);
         }
         // alert('Gallery settings & cover image saved! (Demo mode)'); // Removed demo alert
         onClose();
@@ -103,7 +110,7 @@ export default function GallerySettingsModal({ onClose, onSave, gallery }: Galle
                                     {coverPreview ? (
                                         <div className="relative group w-32 h-32 rounded-sm overflow-hidden border border-neutral-200">
                                             <img
-                                                src={coverPreview}
+                                                src={coverPreview?.startsWith('data:') ? coverPreview : `/storage/${coverPreview}`}
                                                 alt="Cover preview"
                                                 className="w-full h-full object-cover"
                                             />
