@@ -57,7 +57,7 @@ export interface CreateGalleryRequest {
 
 export interface UpdateGalleryRequest {
     title?: string;
-    description?: string;
+    description?: string | null;
     password?: string | null;
     allow_downloads?: boolean;
     allow_favorites?: boolean;

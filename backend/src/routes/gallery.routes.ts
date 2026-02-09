@@ -282,7 +282,8 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
 
             const buffer = await data.toBuffer();
             const filename = `cover-${id}-${Date.now()}${path.extname(data.filename)}`;
-            const uploadDir = path.join(process.cwd(), 'storage', 'uploads');
+            // Use absolute path matching Docker volume
+            const uploadDir = path.join('/storage', 'uploads');
             const filePath = path.join(uploadDir, filename);
 
             // Ensure directory exists

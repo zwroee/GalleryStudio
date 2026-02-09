@@ -81,7 +81,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
 
             const buffer = await data.toBuffer();
             const filename = `watermark-${Date.now()}${require('path').extname(data.filename)}`;
-            const uploadDir = require('path').join(process.cwd(), 'storage', 'uploads');
+            const uploadDir = require('path').join('/storage', 'uploads');
             const filePath = require('path').join(uploadDir, filename);
 
             // Ensure directory exists
