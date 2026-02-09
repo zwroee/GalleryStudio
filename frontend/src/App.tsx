@@ -10,7 +10,6 @@ import LoginPage from './pages/LoginPage';
 import AdminDashboard from './pages/AdminDashboard';
 import GalleryManagement from './pages/GalleryManagement';
 import ClientGalleryView from './pages/ClientGalleryView';
-import DemoPage from './pages/DemoPage';
 import PortfolioPage from './pages/PortfolioPage';
 
 // Five Feathers Photography Pages
