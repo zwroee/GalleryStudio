@@ -110,6 +110,17 @@ export const galleryApi = {
         const { data } = await api.delete(`/galleries/${galleryId}/photos/${photoId}`);
         return data;
     },
+
+    uploadCover: async (galleryId: string, file: File): Promise<{ success: boolean; path: string }> => {
+        const formData = new FormData();
+        formData.append('file', file);
+        const { data } = await api.post(`/galleries/${galleryId}/cover`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return data;
+    },
 };
 
 // Client API (for gallery viewing)

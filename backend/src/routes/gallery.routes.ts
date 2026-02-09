@@ -258,6 +258,50 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
 
         return reply;
     });
+
+    /**
+     * POST /api/galleries/:id/cover
+     * Upload cover image
+     */
+    interface UploadCoverRequest {
+        Params: { id: string };
+    }
+    fastify.post<UploadCoverRequest>('/:id/cover', { onRequest: [authenticate] }, async (request, reply) => {
+        const { id } = request.params;
+
+        const gallery = await GalleryService.getGalleryById(id, false);
+        if (!gallery) {
+            return reply.status(404).send({ error: 'Gallery not found' });
+        }
+
+        try {
+            const data = await request.file();
+            if (!data) {
+                return reply.status(400).send({ error: 'No file uploaded' });
+            }
+
+            const buffer = await data.toBuffer();
+            const filename = `cover-${id}-${Date.now()}${path.extname(data.filename)}`;
+            const uploadDir = path.join(process.cwd(), 'storage', 'uploads');
+            const filePath = path.join(uploadDir, filename);
+
+            // Ensure directory exists
+            await fs.mkdir(uploadDir, { recursive: true });
+
+            // Save file
+            await fs.writeFile(filePath, buffer);
+
+            const relativePath = `uploads/${filename}`;
+
+            // Update gallery record
+            await GalleryService.updateGallery(id, { cover_image_path: relativePath });
+
+            return { success: true, path: relativePath };
+        } catch (err) {
+            request.log.error(err);
+            return reply.status(500).send({ error: 'Upload failed' });
+        }
+    });
 }
 
 /**

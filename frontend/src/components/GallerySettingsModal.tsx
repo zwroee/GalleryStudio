@@ -58,10 +58,10 @@ export default function GallerySettingsModal({ onClose, onSave, gallery }: Galle
                 allow_downloads: formData.allow_downloads,
                 allow_favorites: formData.allow_favorites,
                 expires_at: formData.expires_at ? new Date(formData.expires_at).toISOString() : null,
-                cover_image: coverPreview,
+                cover_image_file: coverImageFile, // Pass file for upload
             });
         }
-        alert('Gallery settings & cover image saved! (Demo mode)');
+        // alert('Gallery settings & cover image saved! (Demo mode)'); // Removed demo alert
         onClose();
     };
 

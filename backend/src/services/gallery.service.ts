@@ -118,6 +118,11 @@ export class GalleryService {
             values.push(data.allow_favorites);
         }
 
+        if (data.cover_image_path !== undefined) {
+            updates.push(`cover_image_path = $${paramCount++}`);
+            values.push(data.cover_image_path);
+        }
+
         if (updates.length === 0) {
             return this.getGalleryById(id, false) as Promise<Gallery | null>;
         }

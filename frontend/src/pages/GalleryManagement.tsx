@@ -91,6 +91,22 @@ export default function GalleryManagement() {
     const handleUpdateGallery = async (updatedData: any) => {
         if (!id) return;
         try {
+            // Handle Cover Image Upload if present
+            if (updatedData.cover_image_file) {
+                await galleryApi.uploadCover(id, updatedData.cover_image_file);
+                // Remove file from data before sending JSON update
+                delete updatedData.cover_image_file;
+            }
+
+            // Remove cover_image string if present (legacy/preview)
+            if ('cover_image' in updatedData) {
+                // If explicitly set to null (removed), update path to null
+                if (updatedData.cover_image === null) {
+                    updatedData.cover_image_path = null;
+                }
+                delete updatedData.cover_image;
+            }
+
             await galleryApi.update(id, updatedData);
             await loadGallery();
             setShowSettings(false);

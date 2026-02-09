@@ -62,6 +62,7 @@ export interface UpdateGalleryRequest {
     allow_downloads?: boolean;
     allow_favorites?: boolean;
     expires_at?: string;
+    cover_image_path?: string;
 }
 
 export interface LoginRequest {

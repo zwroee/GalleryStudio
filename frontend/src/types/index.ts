@@ -83,6 +83,7 @@ export interface UpdateGalleryRequest {
     allow_favorites?: boolean;
     expires_at?: string | null;
     cover_image?: string | null;
+    cover_image_path?: string | null;
 }
 
 export interface VerifyPasswordRequest {
