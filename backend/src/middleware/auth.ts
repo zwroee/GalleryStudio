@@ -1,13 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 
-interface FastifyRequest {
-    userData?: {
-        id: string;
-        username: string;
-    };
-}
-}
-
 // Authentication middleware for admin routes
 export async function authenticate(
     request: FastifyRequest,

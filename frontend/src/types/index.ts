@@ -25,7 +25,10 @@ export interface Photo {
     processing_status: 'pending' | 'processing' | 'completed' | 'failed';
     upload_order: number | null;
     created_at: string;
+    is_favorited?: boolean;
 }
+
+export type User = AdminUser;
 
 export interface Favorite {
     id: string;

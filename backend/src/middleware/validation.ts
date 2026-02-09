@@ -12,7 +12,7 @@ export const createGallerySchema = z.object({
 export const updateGallerySchema = z.object({
     title: z.string().min(1).max(255).optional(),
     description: z.string().optional(),
-    password: z.string().min(4).optional().nullable(),
+    password: z.string().min(4).optional(),
     allow_downloads: z.boolean().optional(),
     allow_favorites: z.boolean().optional(),
 });

@@ -16,7 +16,14 @@ export default function LoginPage() {
         await new Promise(resolve => setTimeout(resolve, 800));
 
         // Demo login
-        await login('demo', 'demo');
+        await login({
+            id: 'demo-id',
+            username: 'demo',
+            email: 'demo@example.com',
+            password_hash: '',
+            watermark_logo_path: null,
+            created_at: new Date().toISOString()
+        }, 'demo-token');
         navigate('/admin');
     };
 
