@@ -70,7 +70,7 @@ export default function AdminDashboard() {
                         </div>
                         <div className="flex gap-4">
                             <button
-                                onClick={() => window.open('/portfolio', '_blank')}
+                                onClick={() => window.open('/gallery-studio/portfolio', '_blank')}
                                 className="btn-secondary flex items-center gap-2"
                             >
                                 <ExternalLink className="w-4 h-4" />
@@ -138,7 +138,7 @@ export default function AdminDashboard() {
                                 {galleries.map((gallery) => (
                                     <Link
                                         key={gallery.id}
-                                        to={`/admin/gallery/${gallery.id}`}
+                                        to={`/gallery-studio/admin/gallery/${gallery.id}`}
                                         className="card hover:shadow-md transition-shadow group"
                                     >
                                         <div className="flex items-start justify-between mb-3">
