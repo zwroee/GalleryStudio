@@ -6,6 +6,8 @@ export interface Gallery {
     password_hash: string | null;
     allow_downloads: boolean;
     allow_favorites: boolean;
+    expires_at: string | null;
+    cover_image: string | null;
     is_public?: boolean;
     cover_image_path?: string | null;
     photo_count?: number;
@@ -76,6 +78,8 @@ export interface UpdateGalleryRequest {
     password?: string | null;
     allow_downloads?: boolean;
     allow_favorites?: boolean;
+    expires_at?: string | null;
+    cover_image?: string | null;
 }
 
 export interface VerifyPasswordRequest {

@@ -6,6 +6,7 @@ export interface Gallery {
     password_hash: string | null;
     allow_downloads: boolean;
     allow_favorites: boolean;
+    expires_at: Date | null;
     created_at: Date;
     updated_at: Date;
 }
@@ -54,6 +55,7 @@ export interface UpdateGalleryRequest {
     password?: string;
     allow_downloads?: boolean;
     allow_favorites?: boolean;
+    expires_at?: string;
 }
 
 export interface LoginRequest {

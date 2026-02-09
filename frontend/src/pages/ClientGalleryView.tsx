@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Lock, Heart, Download, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Lock, Heart, Download, X, ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { clientApi } from '../services/api';
 import { useClientStore } from '../store/clientStore';
 import type { GalleryWithPhotos, Photo } from '../types';
+import SlideshowViewer from '../components/SlideshowViewer';
 
 export default function ClientGalleryView() {
     const { id } = useParams<{ id: string }>();
@@ -14,6 +15,8 @@ export default function ClientGalleryView() {
     const [passwordRequired, setPasswordRequired] = useState(false);
     const [error, setError] = useState('');
     const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+    const [slideshowActive, setSlideshowActive] = useState(false);
+    const [slideshowStartIndex, setSlideshowStartIndex] = useState(0);
 
     const sessionId = useClientStore((state) => state.sessionId);
     const getGalleryToken = useClientStore((state) => state.getGalleryToken);
@@ -190,7 +193,30 @@ export default function ClientGalleryView() {
                     {gallery.description && (
                         <p className="text-gray-600 mt-2">{gallery.description}</p>
                     )}
-                    <p className="text-sm text-gray-500 mt-2">{gallery.photos.length} photos</p>
+                    <div className="flex items-center justify-between mt-4">
+                        <p className="text-sm text-gray-500">{gallery.photos.length} photos</p>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => {
+                                    setSlideshowStartIndex(0);
+                                    setSlideshowActive(true);
+                                }}
+                                className="btn-primary text-xs flex items-center gap-2"
+                            >
+                                <Play className="w-4 h-4" />
+                                Start Slideshow
+                            </button>
+                            {gallery.allow_downloads && (
+                                <button
+                                    onClick={() => {/* handleDownloadAll logic needed later */ }}
+                                    className="btn-secondary text-xs flex items-center gap-2"
+                                >
+                                    <Download className="w-4 h-4" />
+                                    Download All
+                                </button>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </header>
 
@@ -285,6 +311,14 @@ export default function ClientGalleryView() {
                         )}
                     </div>
                 </div>
+            )}
+            {/* Slideshow Viewer */}
+            {slideshowActive && gallery && (
+                <SlideshowViewer
+                    photos={gallery.photos}
+                    startIndex={slideshowStartIndex}
+                    onClose={() => setSlideshowActive(false)}
+                />
             )}
         </div>
     );

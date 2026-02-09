@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Upload, Trash2, Settings, Copy, Check } from 'lucide-react';
 import { galleryApi } from '../services/api';
 import type { GalleryWithPhotos } from '../types';
+import GallerySettingsModal from '../components/GallerySettingsModal';
 
 export default function GalleryManagement() {
     const { id } = useParams<{ id: string }>();
@@ -14,6 +15,7 @@ export default function GalleryManagement() {
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [copied, setCopied] = useState(false);
+    const [showSettings, setShowSettings] = useState(false);
 
     useEffect(() => {
         if (id) loadGallery();
@@ -86,6 +88,18 @@ export default function GalleryManagement() {
         setTimeout(() => setCopied(false), 2000);
     };
 
+    const handleUpdateGallery = async (updatedData: any) => {
+        if (!id) return;
+        try {
+            await galleryApi.update(id, updatedData);
+            await loadGallery();
+            setShowSettings(false);
+        } catch (err) {
+            console.error('Failed to update gallery:', err);
+            alert('Failed to update gallery settings');
+        }
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -128,6 +142,10 @@ export default function GalleryManagement() {
                             </div>
                         </div>
                         <div className="flex gap-2">
+                            <button onClick={() => setShowSettings(true)} className="btn-secondary flex items-center gap-2">
+                                <Settings className="w-4 h-4" />
+                                Settings
+                            </button>
                             <button onClick={copyGalleryLink} className="btn-secondary flex items-center gap-2">
                                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                                 {copied ? 'Copied!' : 'Copy Link'}
@@ -203,6 +221,15 @@ export default function GalleryManagement() {
                     )}
                 </div>
             </main>
+
+            {/* Settings Modal */}
+            {showSettings && gallery && (
+                <GallerySettingsModal
+                    gallery={gallery}
+                    onClose={() => setShowSettings(false)}
+                    onSave={handleUpdateGallery}
+                />
+            )}
         </div>
     );
 }
