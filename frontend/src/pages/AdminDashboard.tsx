@@ -139,8 +139,23 @@ export default function AdminDashboard() {
                                     <Link
                                         key={gallery.id}
                                         to={`/gallery-studio/admin/gallery/${gallery.id}`}
-                                        className="card hover:shadow-md transition-shadow group"
+                                        className="card hover:shadow-md transition-shadow group overflow-hidden"
                                     >
+                                        {/* Cover Image or Placeholder */}
+                                        {gallery.cover_image_path ? (
+                                            <div className="w-full h-48 bg-gray-100 mb-4 -mx-6 -mt-6 overflow-hidden">
+                                                <img
+                                                    src={gallery.cover_image_path}
+                                                    alt={gallery.title}
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 mb-4 -mx-6 -mt-6 flex items-center justify-center">
+                                                <ImageIcon className="w-16 h-16 text-gray-400" />
+                                            </div>
+                                        )}
+
                                         <div className="flex items-start justify-between mb-3">
                                             <h3 className="text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
                                                 {gallery.title}
