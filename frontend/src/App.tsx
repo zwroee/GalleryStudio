@@ -36,9 +36,14 @@ function App() {
             <Routes>
                 {/* Gallery Studio Routes (Admin/Demo System) */}
                 <Route path="/" element={<Navigate to="/gallery-studio" />} />
-                <Route path="/gallery-studio" element={<DemoPage />} />
-                <Route path="/gallery-studio/admin" element={<AdminDashboard />} />
-                <Route path="/gallery-studio/admin/gallery/:id" element={<GalleryManagement />} />
+                <Route path="/gallery-studio" element={<LoginPage />} />
+                <Route path="/gallery-studio/login" element={<LoginPage />} />
+                <Route path="/gallery-studio/admin" element={
+                    isAuthenticated ? <AdminDashboard /> : <Navigate to="/gallery-studio/login" />
+                } />
+                <Route path="/gallery-studio/admin/gallery/:id" element={
+                    isAuthenticated ? <GalleryManagement /> : <Navigate to="/gallery-studio/login" />
+                } />
                 <Route path="/gallery-studio/gallery/:id" element={<ClientGalleryView />} />
                 <Route path="/gallery-studio/portfolio" element={<PortfolioPage />} />
 

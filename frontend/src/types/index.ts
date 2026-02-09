@@ -40,10 +40,10 @@ export interface Favorite {
 export interface AdminUser {
     id: string;
     username: string;
-    password_hash: string;
+    password_hash?: string;
     email: string;
     watermark_logo_path: string | null;
-    created_at: string;
+    created_at?: string;
 }
 
 // API Request/Response Types
