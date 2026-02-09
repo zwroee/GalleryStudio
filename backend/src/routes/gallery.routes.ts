@@ -138,6 +138,9 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
         }
 
         try {
+            const safeTempDir = path.join('/storage', 'temp');
+            await fs.mkdir(safeTempDir, { recursive: true });
+
             const files = await request.saveRequestFiles();
             const uploadedPhotos = [];
 
@@ -145,6 +148,10 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
                 const file = files[i];
                 const filename = file.filename;
                 const tempPath = file.filepath;
+
+                // Copy to safe temp location (Fastify deletes tempPath after response)
+                const safePath = path.join(safeTempDir, `${Date.now()}-${filename}`);
+                await fs.copyFile(tempPath, safePath);
 
                 // Add photo record with pending status
                 const photo = await GalleryService.addPhoto(
@@ -160,8 +167,8 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
                 const adminUser = await AuthService.getUserById(user.id);
                 const watermarkPath = adminUser?.watermark_logo_path || undefined;
 
-                // Process image asynchronously
-                processImageAsync(galleryId, photo.id, tempPath, filename, watermarkPath);
+                // Process image asynchronously using SAFE path
+                processImageAsync(galleryId, photo.id, safePath, filename, watermarkPath);
 
                 uploadedPhotos.push({
                     id: photo.id,

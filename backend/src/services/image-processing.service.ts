@@ -277,7 +277,7 @@ export class ImageProcessingService {
         tempPath: string,
         filename: string
     ): Promise<{ url: string; width: number; height: number }> {
-        const portfolioDir = path.join(config.storagePath, 'portfolio');
+        const portfolioDir = path.join('/storage', 'portfolio');
         await fs.mkdir(portfolioDir, { recursive: true });
 
         // Generate unique filename
