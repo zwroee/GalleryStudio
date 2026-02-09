@@ -196,57 +196,6 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
 
         return { success: true };
     });
-}
-
-/**
- * Process image asynchronously (non-blocking)
- */
-async function processImageAsync(
-    galleryId: string,
-    photoId: string,
-    tempPath: string,
-    filename: string
-) {
-    try {
-        // Update status to processing
-        await GalleryService.updatePhotoStatus(photoId, 'processing');
-
-        // Process image
-        const processed = await ImageProcessingService.processImage(
-            galleryId,
-            tempPath,
-            filename
-        );
-
-        // Update photo record with actual metadata
-        const photo = await GalleryService.getPhotoById(photoId);
-        if (photo) {
-            // Update with actual metadata from processing
-            await updatePhotoMetadata(
-                photoId,
-                path.relative(process.cwd(), processed.sizes.original),
-                processed.width,
-                processed.height,
-                processed.fileSize,
-                processed.mimeType
-            );
-
-            await GalleryService.updatePhotoStatus(photoId, 'completed');
-        }
-
-        // Clean up temp file
-        await fs.unlink(tempPath);
-
-        console.log(`✓ Processed image: ${filename}`);
-    } catch (err) {
-        console.error(`✗ Failed to process image: ${filename}`, err);
-        await GalleryService.updatePhotoStatus(photoId, 'failed');
-
-        // Clean up temp file
-        try {
-            await fs.unlink(tempPath);
-        } catch { }
-    }
 
     /**
      * POST /api/galleries/:id/download-all
@@ -306,3 +255,54 @@ async function processImageAsync(
     });
 }
 
+/**
+ * Process image asynchronously (non-blocking)
+ */
+async function processImageAsync(
+    galleryId: string,
+    photoId: string,
+    tempPath: string,
+    filename: string
+) {
+    try {
+        // Update status to processing
+        await GalleryService.updatePhotoStatus(photoId, 'processing');
+
+        // Process image
+        const processed = await ImageProcessingService.processImage(
+            galleryId,
+            tempPath,
+            filename
+        );
+
+        // Update photo record with actual metadata
+        const photo = await GalleryService.getPhotoById(photoId);
+        if (photo) {
+            // Update with actual metadata from processing
+            await updatePhotoMetadata(
+                photoId,
+                path.relative(process.cwd(), processed.sizes.original),
+                processed.width,
+                processed.height,
+                processed.fileSize,
+                processed.mimeType
+            );
+
+            await GalleryService.updatePhotoStatus(photoId, 'completed');
+        }
+
+        // Clean up temp file
+        await fs.unlink(tempPath);
+
+        console.log(`✓ Processed image: ${filename}`);
+    } catch (err) {
+        console.error(`✗ Failed to process image: ${filename}`, err);
+        await GalleryService.updatePhotoStatus(photoId, 'failed');
+
+        // Clean up temp file
+        try {
+            await fs.unlink(tempPath);
+        } catch { }
+    }
+
+}
