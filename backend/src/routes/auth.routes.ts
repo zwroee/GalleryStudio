@@ -64,4 +64,41 @@ export default async function authRoutes(fastify: FastifyInstance) {
             return reply.status(401).send({ error: 'Invalid token' });
         }
     });
+
+    /**
+     * POST /api/auth/watermark
+     * Upload watermark logo
+     */
+    fastify.post('/watermark', async (request: FastifyRequest, reply: FastifyReply) => {
+        try {
+            await request.jwtVerify();
+            const payload = request.user as { id: string };
+
+            const data = await request.file();
+            if (!data) {
+                return reply.status(400).send({ error: 'No file uploaded' });
+            }
+
+            const buffer = await data.toBuffer();
+            const filename = `watermark-${Date.now()}${require('path').extname(data.filename)}`;
+            const uploadDir = require('path').join(process.cwd(), 'storage', 'uploads');
+            const filePath = require('path').join(uploadDir, filename);
+
+            // Ensure directory exists
+            await require('fs').promises.mkdir(uploadDir, { recursive: true });
+
+            // Save file
+            await require('fs').promises.writeFile(filePath, buffer);
+
+            const relativePath = `uploads/${filename}`;
+
+            // Update user record
+            await AuthService.updateWatermark(payload.id, relativePath);
+
+            return { success: true, path: relativePath };
+        } catch (err) {
+            request.log.error(err);
+            return reply.status(500).send({ error: 'Upload failed' });
+        }
+    });
 }

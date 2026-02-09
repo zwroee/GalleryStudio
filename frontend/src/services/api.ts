@@ -36,6 +36,17 @@ export const authApi = {
         const { data } = await api.get('/auth/verify');
         return data;
     },
+
+    uploadWatermark: async (file: File): Promise<{ success: true; path: string }> => {
+        const formData = new FormData();
+        formData.append('file', file);
+        const { data } = await api.post('/auth/watermark', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return data;
+    },
 };
 
 // Admin Gallery API

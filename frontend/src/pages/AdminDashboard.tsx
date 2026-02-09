@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, LogOut, Image as ImageIcon, Lock, Trash2, Upload, ExternalLink, Eye, Download, Heart } from 'lucide-react';
-import { galleryApi } from '../services/api';
+import { Plus, LogOut, Image as ImageIcon, Lock, Trash2, Upload, ExternalLink, Eye, Download, Heart, Settings } from 'lucide-react';
+import { galleryApi, authApi } from '../services/api';
 import { useAuthStore } from '../store/authStore';
 import { usePortfolioStore } from '../store/portfolioStore';
 import type { Gallery } from '../types';
@@ -11,7 +11,7 @@ export default function AdminDashboard() {
     const [galleries, setGalleries] = useState<Gallery[]>([]);
     const [loading, setLoading] = useState(true);
     const [showCreateModal, setShowCreateModal] = useState(false);
-    const [activeTab, setActiveTab] = useState<'galleries' | 'portfolio'>('galleries');
+    const [activeTab, setActiveTab] = useState<'galleries' | 'portfolio' | 'settings'>('galleries');
 
     const user = useAuthStore((state) => state.user);
     const logout = useAuthStore((state) => state.logout);
@@ -71,6 +71,31 @@ export default function AdminDashboard() {
         }
     };
 
+    // Watermark Upload
+    const watermarkInputRef = useRef<HTMLInputElement>(null);
+    const handleWatermarkUploadClick = () => {
+        if (watermarkInputRef.current) {
+            watermarkInputRef.current.click();
+        }
+    };
+
+    const handleWatermarkChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        try {
+            const result = await authApi.uploadWatermark(file);
+            alert('Watermark uploaded successfully!');
+        } catch (err) {
+            console.error('Failed to upload watermark:', err);
+            alert('Failed to upload watermark');
+        } finally {
+            if (watermarkInputRef.current) {
+                watermarkInputRef.current.value = '';
+            }
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
@@ -120,9 +145,18 @@ export default function AdminDashboard() {
                             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-600 rounded-t-full" />
                         )}
                     </button>
+                    <button
+                        onClick={() => setActiveTab('settings')}
+                        className={`pb-4 text-sm font-medium transition-colors relative ${activeTab === 'settings' ? 'text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}
+                    >
+                        Settings
+                        {activeTab === 'settings' && (
+                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-600 rounded-t-full" />
+                        )}
+                    </button>
                 </div>
 
-                {activeTab === 'galleries' ? (
+                {activeTab === 'galleries' && (
                     <>
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl font-semibold text-gray-900">Your Galleries</h2>
@@ -208,33 +242,10 @@ export default function AdminDashboard() {
                             </div>
                         )}
                     </>
-                ) : (
-                    /* Portfolio Management View */
-                    <div className="space-y-8">
-                        <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Portfolio Settings</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Business Name</label>
-                                    <input
-                                        type="text"
-                                        className="input-field"
-                                        value={businessName}
-                                        onChange={(e) => updateProfile({ businessName: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Website URL</label>
-                                    <input
-                                        type="text"
-                                        className="input-field"
-                                        value={website}
-                                        onChange={(e) => updateProfile({ website: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-                        </div>
+                )}
 
+                {activeTab === 'portfolio' && (
+                    <div className="space-y-8">
                         <div>
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="text-lg font-semibold text-gray-900">Portfolio Images</h3>
@@ -242,7 +253,6 @@ export default function AdminDashboard() {
                                     onClick={handleAddPortfolioImage}
                                     className="btn-primary flex items-center gap-2"
                                 >
-                                    <Upload className="w-5 h-5" />
                                     <Upload className="w-5 h-5" />
                                     Add Image
                                 </button>
@@ -270,6 +280,61 @@ export default function AdminDashboard() {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'settings' && (
+                    <div className="space-y-8">
+                        <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Business Profile</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Business Name</label>
+                                    <input
+                                        type="text"
+                                        className="input-field"
+                                        value={businessName}
+                                        onChange={(e) => updateProfile({ businessName: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Website URL</label>
+                                    <input
+                                        type="text"
+                                        className="input-field"
+                                        value={website}
+                                        onChange={(e) => updateProfile({ website: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Watermark Settings</h3>
+                            <div className="flex items-start gap-6">
+                                <div className="flex-1">
+                                    <p className="text-sm text-gray-600 mb-4">
+                                        Upload a PNG logo to be used as a watermark on your images.
+                                        The watermark will be applied to all high-resolution downloads.
+                                        For best results, use a high-quality PNG with transparency.
+                                    </p>
+                                    <button
+                                        onClick={handleWatermarkUploadClick}
+                                        className="btn-secondary flex items-center gap-2"
+                                    >
+                                        <Upload className="w-4 h-4" />
+                                        Upload Watermark
+                                    </button>
+                                    <input
+                                        type="file"
+                                        ref={watermarkInputRef}
+                                        onChange={handleWatermarkChange}
+                                        className="hidden"
+                                        accept="image/png"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>

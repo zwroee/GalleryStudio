@@ -92,4 +92,14 @@ export class AuthService {
     static async hashPassword(password: string): Promise<string> {
         return bcrypt.hash(password, SALT_ROUNDS);
     }
+
+    /**
+     * Update admin watermark path
+     */
+    static async updateWatermark(userId: string, watermarkPath: string | null): Promise<void> {
+        await pool.query(
+            'UPDATE admin_users SET watermark_logo_path = $1 WHERE id = $2',
+            [watermarkPath, userId]
+        );
+    }
 }
