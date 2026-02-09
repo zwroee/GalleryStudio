@@ -8,9 +8,12 @@ export class GalleryService {
      */
     static async getAllGalleries(): Promise<Gallery[]> {
         const result = await pool.query<Gallery>(
-            `SELECT g.*, COUNT(p.id)::int as photo_count
+            `SELECT g.*, 
+                COUNT(DISTINCT p.id)::int as photo_count,
+                COUNT(DISTINCT f.id)::int as favorite_count
        FROM galleries g
        LEFT JOIN photos p ON g.id = p.gallery_id AND p.processing_status = 'completed'
+       LEFT JOIN favorites f ON p.id = f.photo_id
        GROUP BY g.id
        ORDER BY g.created_at DESC`
         );

@@ -1,19 +1,12 @@
 import { useState, useRef } from 'react';
 import { X, Lock, Download, Heart, Calendar, Save, Eye, EyeOff, Upload, Image as ImageIcon, Trash2 } from 'lucide-react';
 
+import { Gallery } from '../types';
+
 interface GallerySettingsModalProps {
     onClose: () => void;
     onSave?: (updatedGallery: any) => void;
-    gallery: {
-        id: string;
-        title: string;
-        description: string | null;
-        password_hash: string | null;
-        allow_downloads: boolean;
-        allow_favorites: boolean;
-        expires_at: string | null;
-        cover_image: string | null;
-    };
+    gallery: Gallery;
 }
 
 export default function GallerySettingsModal({ onClose, onSave, gallery }: GallerySettingsModalProps) {
@@ -30,7 +23,7 @@ export default function GallerySettingsModal({ onClose, onSave, gallery }: Galle
 
     // Cover Image State
     const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
-    const [coverPreview, setCoverPreview] = useState<string | null>(gallery.cover_image);
+    const [coverPreview, setCoverPreview] = useState<string | null>(gallery.cover_image ?? null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {

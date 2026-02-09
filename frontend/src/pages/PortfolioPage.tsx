@@ -1,13 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Instagram, Facebook, Mail, Phone, Globe, Search, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePortfolioStore } from '../store/portfolioStore';
 
 export default function PortfolioPage() {
-    const { businessName, website, phone, email, images, categories } = usePortfolioStore();
+    const { businessName, website, phone, email, images, categories, fetchImages } = usePortfolioStore();
     const [activeCategory, setActiveCategory] = useState("ALL");
     const [searchTerm, setSearchTerm] = useState("");
     const navigate = useNavigate();
+
+    useEffect(() => {
+        fetchImages();
+    }, [fetchImages]);
 
     // Filter photos
     const filteredPhotos = images.filter(photo =>

@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, LogOut, Image as ImageIcon, Lock, Trash2, Upload, ExternalLink } from 'lucide-react';
+import { Plus, LogOut, Image as ImageIcon, Lock, Trash2, Upload, ExternalLink, Eye, Download, Heart } from 'lucide-react';
 import { galleryApi } from '../services/api';
 import { useAuthStore } from '../store/authStore';
 import { usePortfolioStore } from '../store/portfolioStore';
@@ -17,14 +17,18 @@ export default function AdminDashboard() {
     const logout = useAuthStore((state) => state.logout);
 
     // Portfolio Store
+    // Portfolio Store
     const {
         images: portfolioImages,
-        addImage,
+        uploadImage,
         removeImage,
         updateProfile,
         businessName,
         website
     } = usePortfolioStore();
+
+    // Ref for file input
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         loadGalleries();
@@ -47,15 +51,24 @@ export default function AdminDashboard() {
     };
 
     const handleAddPortfolioImage = () => {
-        // Mock image upload
-        const newImageId = Math.random().toString(36).substr(2, 9);
-        const randomHeight = [300, 400, 250, 450][Math.floor(Math.random() * 4)];
-        addImage({
-            id: newImageId,
-            url: `https://picsum.photos/seed/${newImageId}/600/${randomHeight}`,
-            category: "WEDDING", // Default
-            height: randomHeight
-        });
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
+        }
+    };
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        try {
+            await uploadImage(file);
+        } catch (err) {
+            alert('Failed to upload image');
+        } finally {
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+        }
     };
 
     return (
@@ -170,10 +183,24 @@ export default function AdminDashboard() {
                                         )}
 
                                         <div className="flex items-center justify-between text-sm text-gray-500">
-                                            <span className="flex items-center gap-1">
-                                                <ImageIcon className="w-4 h-4" />
-                                                {gallery.photo_count || 0} photos
-                                            </span>
+                                            <div className="flex items-center gap-3">
+                                                <span className="flex items-center gap-1" title="Photos">
+                                                    <ImageIcon className="w-4 h-4" />
+                                                    {gallery.photo_count || 0}
+                                                </span>
+                                                <span className="flex items-center gap-1" title="Views">
+                                                    <Eye className="w-4 h-4" />
+                                                    {gallery.view_count || 0}
+                                                </span>
+                                                <span className="flex items-center gap-1" title="Downloads">
+                                                    <Download className="w-4 h-4" />
+                                                    {gallery.download_count || 0}
+                                                </span>
+                                                <span className="flex items-center gap-1" title="Favorites">
+                                                    <Heart className="w-4 h-4" />
+                                                    {gallery.favorite_count || 0}
+                                                </span>
+                                            </div>
                                             <span>{new Date(gallery.created_at).toLocaleDateString()}</span>
                                         </div>
                                     </Link>
@@ -216,8 +243,16 @@ export default function AdminDashboard() {
                                     className="btn-primary flex items-center gap-2"
                                 >
                                     <Upload className="w-5 h-5" />
-                                    Add Mock Image
+                                    <Upload className="w-5 h-5" />
+                                    Add Image
                                 </button>
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    onChange={handleFileChange}
+                                    className="hidden"
+                                    accept="image/*"
+                                />
                             </div>
 
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -242,12 +277,14 @@ export default function AdminDashboard() {
             </main>
 
             {/* Create Gallery Modal */}
-            {showCreateModal && (
-                <CreateGalleryModal
-                    onClose={() => setShowCreateModal(false)}
-                    onSuccess={handleGalleryCreated}
-                />
-            )}
-        </div>
+            {
+                showCreateModal && (
+                    <CreateGalleryModal
+                        onClose={() => setShowCreateModal(false)}
+                        onSuccess={handleGalleryCreated}
+                    />
+                )
+            }
+        </div >
     );
 }

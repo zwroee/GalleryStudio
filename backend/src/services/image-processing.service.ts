@@ -269,4 +269,63 @@ export class ImageProcessingService {
             console.error(`Failed to delete gallery directory ${galleryPath}:`, err);
         }
     }
+
+    /**
+     * Process portfolio image
+     */
+    static async processPortfolioImage(
+        tempPath: string,
+        filename: string
+    ): Promise<{ url: string; width: number; height: number }> {
+        const portfolioDir = path.join(config.storagePath, 'portfolio');
+        await fs.mkdir(portfolioDir, { recursive: true });
+
+        // Generate unique filename
+        const ext = path.extname(filename);
+        const baseName = path.basename(filename, ext);
+        const uniqueName = `${baseName}-${Date.now()}.jpeg`;
+        const outputPath = path.join(portfolioDir, uniqueName);
+
+        // Process image (resize to reasonable max width, convert to jpeg)
+        const image = sharp(tempPath);
+        const metadata = await image.metadata();
+
+        // Resize if too large
+        if ((metadata.width || 0) > 2000) {
+            image.resize(2000, null, { withoutEnlargement: true });
+        }
+
+        await image
+            .jpeg({ quality: 90 })
+            .toFile(outputPath);
+
+        // Get final dimensions
+        const finalMetadata = await sharp(outputPath).metadata();
+
+        // Clean up temp file
+        try {
+            await fs.unlink(tempPath);
+        } catch { }
+
+        return {
+            url: `/storage/portfolio/${uniqueName}`,
+            width: finalMetadata.width || 0,
+            height: finalMetadata.height || 0
+        };
+    }
+
+    /**
+     * Delete portfolio image
+     */
+    static async deletePortfolioImage(url: string): Promise<void> {
+        // Extract filename from URL (e.g. /storage/portfolio/abc.jpg -> abc.jpg)
+        const filename = path.basename(url);
+        const filePath = path.join(config.storagePath, 'portfolio', filename);
+
+        try {
+            await fs.unlink(filePath);
+        } catch (err) {
+            console.warn(`Failed to delete portfolio image ${filePath}:`, err);
+        }
+    }
 }

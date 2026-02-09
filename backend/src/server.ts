@@ -49,11 +49,13 @@ async function registerRoutes() {
     const authRoutes = await import('./routes/auth.routes');
     const galleryRoutes = await import('./routes/gallery.routes');
     const clientRoutes = await import('./routes/client.routes');
+    const portfolioRoutes = await import('./routes/portfolio.routes');
 
     // Register API routes
     await fastify.register(authRoutes.default, { prefix: '/api/auth' });
     await fastify.register(galleryRoutes.default, { prefix: '/api/galleries' });
     await fastify.register(clientRoutes.default, { prefix: '/api/client' });
+    await fastify.register(portfolioRoutes.default, { prefix: '/api/portfolio' });
 }
 
 // Start server

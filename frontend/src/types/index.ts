@@ -6,13 +6,16 @@ export interface Gallery {
     password_hash: string | null;
     allow_downloads: boolean;
     allow_favorites: boolean;
-    expires_at: string | null;
-    cover_image: string | null;
     is_public?: boolean;
-    cover_image_path?: string | null;
-    photo_count?: number;
     created_at: string;
     updated_at: string;
+    view_count: number;
+    download_count: number;
+    favorite_count?: number;
+    photo_count?: number;
+    cover_image_path?: string;
+    cover_image?: string | null; // For UI compatibility
+    expires_at?: string;
 }
 
 export interface Photo {

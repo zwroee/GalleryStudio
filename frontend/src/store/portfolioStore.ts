@@ -1,11 +1,28 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import axios from 'axios';
 
-interface PortfolioImage {
+// Configure Axios
+const api = axios.create({
+    baseURL: import.meta.env.VITE_API_URL || '/api',
+});
+
+// Add auth token to requests
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
+export interface PortfolioImage {
     id: string;
     url: string;
     category: string;
+    width: number;
     height: number;
+    created_at?: string;
 }
 
 interface PortfolioState {
@@ -15,53 +32,91 @@ interface PortfolioState {
     email: string;
     images: PortfolioImage[];
     categories: string[];
+    isLoading: boolean;
+    error: string | null;
 
     // Actions
+    fetchImages: () => Promise<void>;
     updateProfile: (data: Partial<PortfolioState>) => void;
-    addImage: (image: PortfolioImage) => void;
-    removeImage: (id: string) => void;
-    resetToDefaults: () => void;
+    uploadImage: (file: File) => Promise<void>;
+    removeImage: (id: string) => Promise<void>;
 }
-
-const defaultImages = Array.from({ length: 12 }, (_, i) => ({
-    id: `p-${i}`,
-    url: `https://picsum.photos/seed/${i + 100}/600/${[300, 400, 250, 450][i % 4]}`,
-    category: ["WEDDING", "FAMILY", "NEWBORN"][i % 3],
-    height: [300, 400, 250, 450][i % 4],
-}));
 
 export const usePortfolioStore = create<PortfolioState>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             businessName: "FIVE FEATHERS PHOTOGRAPHY",
             website: "www.5feathersphotography.com",
             phone: "209-900-2315",
             email: "5feathersphotos@gmail.com",
-            images: defaultImages,
+            images: [],
             categories: [
                 "ALL", "WEDDING", "FAMILY", "NEWBORN", "MATERNITY", "SENIOR", "BRANDING"
             ],
+            isLoading: false,
+            error: null,
+
+            fetchImages: async () => {
+                set({ isLoading: true, error: null });
+                try {
+                    const response = await api.get('/portfolio');
+                    set({ images: response.data.images, isLoading: false });
+                } catch (err) {
+                    console.error('Failed to fetch portfolio images:', err);
+                    set({ error: 'Failed to load images', isLoading: false });
+                }
+            },
 
             updateProfile: (data) => set((state) => ({ ...state, ...data })),
 
-            addImage: (image) => set((state) => ({
-                images: [image, ...state.images]
-            })),
+            uploadImage: async (file: File) => {
+                set({ isLoading: true, error: null });
+                try {
+                    const formData = new FormData();
+                    formData.append('file', file);
 
-            removeImage: (id) => set((state) => ({
-                images: state.images.filter((img) => img.id !== id)
-            })),
+                    const response = await api.post('/portfolio', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
 
-            resetToDefaults: () => set({
-                businessName: "FIVE FEATHERS PHOTOGRAPHY",
-                website: "www.5feathersphotography.com",
-                phone: "209-900-2315",
-                email: "5feathersphotos@gmail.com",
-                images: defaultImages,
-            })
+                    set((state) => ({
+                        images: [response.data.image, ...state.images],
+                        isLoading: false
+                    }));
+                } catch (err) {
+                    console.error('Failed to upload image:', err);
+                    set({ error: 'Failed to upload image', isLoading: false });
+                    throw err;
+                }
+            },
+
+            removeImage: async (id: string) => {
+                // Optimistic update
+                const previousImages = get().images;
+                set((state) => ({
+                    images: state.images.filter((img) => img.id !== id)
+                }));
+
+                try {
+                    await api.delete(`/portfolio/${id}`);
+                } catch (err) {
+                    console.error('Failed to delete image:', err);
+                    // Revert on failure
+                    set({ images: previousImages, error: 'Failed to delete image' });
+                    throw err;
+                }
+            },
         }),
         {
-            name: 'portfolio-storage', // unique name for localStorage
+            name: 'portfolio-storage',
+            partialize: (state) => ({
+                businessName: state.businessName,
+                website: state.website,
+                phone: state.phone,
+                email: state.email
+            }), // Only persist profile info, not images (fetch them fresh)
         }
     )
 );

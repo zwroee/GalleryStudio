@@ -7,6 +7,7 @@ import { createGallerySchema, updateGallerySchema, validateBody } from '../middl
 import { GalleryService } from '../services/gallery.service';
 import { ImageProcessingService } from '../services/image-processing.service';
 import { EmailCollectionService } from '../services/email-collection.service';
+import { AuthService } from '../services/auth.service';
 import { updatePhotoMetadata } from '../utils/photo.utils';
 import { CreateGalleryRequest, UpdateGalleryRequest } from '../types';
 
@@ -155,8 +156,12 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
                     i
                 );
 
+                const user = request.user as { id: string };
+                const adminUser = await AuthService.getUserById(user.id);
+                const watermarkPath = adminUser?.watermark_logo_path || undefined;
+
                 // Process image asynchronously
-                processImageAsync(galleryId, photo.id, tempPath, filename);
+                processImageAsync(galleryId, photo.id, tempPath, filename, watermarkPath);
 
                 uploadedPhotos.push({
                     id: photo.id,
@@ -262,7 +267,8 @@ async function processImageAsync(
     galleryId: string,
     photoId: string,
     tempPath: string,
-    filename: string
+    filename: string,
+    watermarkPath?: string
 ) {
     try {
         // Update status to processing
@@ -272,7 +278,8 @@ async function processImageAsync(
         const processed = await ImageProcessingService.processImage(
             galleryId,
             tempPath,
-            filename
+            filename,
+            watermarkPath
         );
 
         // Update photo record with actual metadata

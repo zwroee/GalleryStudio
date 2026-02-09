@@ -22,6 +22,7 @@ const initialGalleries = [
         download_count: 12,
         favorite_count: 18,
         cover_image: null,
+        updated_at: new Date().toISOString(),
     },
     {
         id: '2',
@@ -31,12 +32,13 @@ const initialGalleries = [
         allow_downloads: true,
         allow_favorites: false,
         created_at: '2024-01-20',
-        expires_at: null,
+        expires_at: undefined,
         photo_count: 12,
         view_count: 89,
         download_count: 45,
         favorite_count: 0,
         cover_image: null,
+        updated_at: new Date().toISOString(),
     },
     {
         id: '3',
@@ -52,6 +54,7 @@ const initialGalleries = [
         download_count: 8,
         favorite_count: 12,
         cover_image: null,
+        updated_at: new Date().toISOString(),
     },
 ];
 
@@ -241,7 +244,7 @@ export default function DemoPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {galleries.map((gallery) => {
-                            const daysUntilExpiration = getDaysUntilExpiration(gallery.expires_at);
+                            const daysUntilExpiration = getDaysUntilExpiration(gallery.expires_at || null);
                             const isExpiringSoon = daysUntilExpiration !== null && daysUntilExpiration <= 7;
 
                             return (

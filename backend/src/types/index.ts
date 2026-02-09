@@ -9,6 +9,11 @@ export interface Gallery {
     expires_at: Date | null;
     created_at: Date;
     updated_at: Date;
+    view_count: number;
+    download_count: number;
+    favorite_count?: number;
+    photo_count?: number;
+    cover_image_path?: string;
 }
 
 export interface Photo {
@@ -37,6 +42,7 @@ export interface AdminUser {
     username: string;
     password_hash: string;
     email: string;
+    watermark_logo_path?: string | null;
     created_at: Date;
 }
 
