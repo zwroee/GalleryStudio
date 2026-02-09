@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-neutral-50 text-neutral-900 antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-serif;
+  }
+}
+
+@layer components {
+
+  /* Buttons */
+  .btn-primary {
+    @apply px-6 py-3 bg-neutral-900 text-white rounded-sm font-medium tracking-wide uppercase text-sm hover:bg-neutral-800 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 bg-white text-neutral-900 border border-neutral-300 rounded-sm font-medium tracking-wide uppercase text-sm hover:bg-neutral-50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-danger {
+    @apply px-6 py-3 bg-red-600 text-white rounded-sm font-medium tracking-wide uppercase text-sm hover:bg-red-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Form inputs */
+  .input-field {
+    @apply w-full px-4 py-3 border border-neutral-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all duration-200 bg-white;
+  }
+
+  /* Cards */
+  .card {
+    @apply bg-white rounded-sm shadow-sm border border-neutral-200 p-8 transition-shadow duration-300;
+  }
+
+  /* Image fade-in animation */
+  .image-fade-in {
+    animation: fadeIn 0.4s ease-in;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Photo grid item */
+  .photo-item {
+    @apply relative overflow-hidden bg-neutral-100 cursor-pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .photo-item:hover {
+    @apply shadow-lg;
+    transform: translateY(-2px);
+  }
+
+  .photo-item img {
+    @apply w-full h-full object-cover;
+    transition: transform 0.5s ease;
+  }
+
+  .photo-item:hover img {
+    transform: scale(1.05);
+  }
+
+  /* Overlay for photo items */
+  .photo-overlay {
+    @apply absolute inset-0 bg-black bg-opacity-0 flex items-center justify-center;
+    transition: background-color 0.3s ease;
+  }
+
+  .photo-item:hover .photo-overlay {
+    @apply bg-opacity-30;
+  }
+
+  /* Gallery card hover effect */
+  .gallery-card {
+    @apply card cursor-pointer;
+    transition: all 0.3s ease;
+  }
+
+  .gallery-card:hover {
+    @apply shadow-md;
+    transform: translateY(-4px);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

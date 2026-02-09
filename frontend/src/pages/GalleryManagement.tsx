@@ -1,0 +1,208 @@
+import { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { ArrowLeft, Upload, Trash2, Settings, Copy, Check } from 'lucide-react';
+import { galleryApi } from '../services/api';
+import type { GalleryWithPhotos } from '../types';
+
+export default function GalleryManagement() {
+    const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const [gallery, setGallery] = useState<GalleryWithPhotos | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [uploading, setUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [copied, setCopied] = useState(false);
+
+    useEffect(() => {
+        if (id) loadGallery();
+    }, [id]);
+
+    const loadGallery = async () => {
+        if (!id) return;
+        try {
+            const response = await galleryApi.getById(id);
+            setGallery(response.gallery);
+        } catch (err) {
+            console.error('Failed to load gallery:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        if (files.length === 0 || !id) return;
+
+        setUploading(true);
+        setUploadProgress(0);
+
+        try {
+            await galleryApi.uploadPhotos(id, files, (progress) => {
+                setUploadProgress(progress);
+            });
+
+            // Reload gallery to show new photos
+            await loadGallery();
+        } catch (err) {
+            console.error('Upload failed:', err);
+            alert('Failed to upload photos');
+        } finally {
+            setUploading(false);
+            setUploadProgress(0);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    };
+
+    const handleDeletePhoto = async (photoId: string) => {
+        if (!id || !confirm('Are you sure you want to delete this photo?')) return;
+
+        try {
+            await galleryApi.deletePhoto(id, photoId);
+            await loadGallery();
+        } catch (err) {
+            console.error('Failed to delete photo:', err);
+            alert('Failed to delete photo');
+        }
+    };
+
+    const handleDeleteGallery = async () => {
+        if (!id || !confirm('Are you sure? This will delete the gallery and all photos permanently.')) return;
+
+        try {
+            await galleryApi.delete(id);
+            navigate('/admin');
+        } catch (err) {
+            console.error('Failed to delete gallery:', err);
+            alert('Failed to delete gallery');
+        }
+    };
+
+    const copyGalleryLink = () => {
+        const link = `${window.location.origin}/gallery/${id}`;
+        navigator.clipboard.writeText(link);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary-600 border-t-transparent"></div>
+                    <p className="mt-2 text-gray-600">Loading gallery...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!gallery) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-gray-600">Gallery not found</p>
+                    <Link to="/admin" className="btn-primary mt-4">
+                        Back to Dashboard
+                    </Link>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-gray-50">
+            {/* Header */}
+            <header className="bg-white border-b border-gray-200">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <Link to="/admin" className="text-gray-600 hover:text-gray-900">
+                                <ArrowLeft className="w-6 h-6" />
+                            </Link>
+                            <div>
+                                <h1 className="text-2xl font-bold text-gray-900">{gallery.title}</h1>
+                                {gallery.description && (
+                                    <p className="text-sm text-gray-600">{gallery.description}</p>
+                                )}
+                            </div>
+                        </div>
+                        <div className="flex gap-2">
+                            <button onClick={copyGalleryLink} className="btn-secondary flex items-center gap-2">
+                                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                                {copied ? 'Copied!' : 'Copy Link'}
+                            </button>
+                            <button onClick={handleDeleteGallery} className="btn-danger flex items-center gap-2">
+                                <Trash2 className="w-4 h-4" />
+                                Delete Gallery
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            {/* Main Content */}
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Upload Section */}
+                <div className="card mb-8">
+                    <h2 className="text-lg font-semibold text-gray-900 mb-4">Upload Photos</h2>
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={handleFileSelect}
+                        className="hidden"
+                    />
+                    <button
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploading}
+                        className="btn-primary flex items-center gap-2"
+                    >
+                        <Upload className="w-5 h-5" />
+                        {uploading ? `Uploading... ${uploadProgress}%` : 'Select Photos'}
+                    </button>
+                </div>
+
+                {/* Photos Grid */}
+                <div>
+                    <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                        Photos ({gallery.photos.length})
+                    </h2>
+
+                    {gallery.photos.length === 0 ? (
+                        <div className="card text-center py-12">
+                            <Upload className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                            <p className="text-gray-600">No photos yet. Upload some to get started!</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {gallery.photos.map((photo) => (
+                                <div key={photo.id} className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                                    <img
+                                        src={`/storage/galleries/${gallery.id}/thumbnail/${photo.filename}`}
+                                        alt={photo.filename}
+                                        className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all flex items-center justify-center">
+                                        <button
+                                            onClick={() => handleDeletePhoto(photo.id)}
+                                            className="opacity-0 group-hover:opacity-100 transition-opacity bg-red-600 text-white p-2 rounded-lg hover:bg-red-700"
+                                        >
+                                            <Trash2 className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                    {photo.processing_status !== 'completed' && (
+                                        <div className="absolute top-2 right-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded">
+                                            {photo.processing_status}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </main>
+        </div>
+    );
+}

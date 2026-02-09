@@ -1,0 +1,34 @@
+{
+  "name": "pixiset-backend",
+  "version": "1.0.0",
+  "description": "Self-hosted photo gallery platform backend",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "npm run migrate:up && node dist/server.js",
+    "migrate:up": "node-pg-migrate up",
+    "migrate:down": "node-pg-migrate down",
+    "migrate:create": "node-pg-migrate create",
+    "create-admin": "tsx scripts/create-admin.ts"
+  },
+  "dependencies": {
+    "@fastify/cors": "^9.0.1",
+    "@fastify/jwt": "^8.0.0",
+    "@fastify/multipart": "^8.1.0",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.1",
+    "fastify": "^4.26.0",
+    "node-pg-migrate": "^7.0.2",
+    "pg": "^8.11.3",
+    "sharp": "^0.33.2",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/node": "^20.11.16",
+    "@types/pg": "^8.11.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}
