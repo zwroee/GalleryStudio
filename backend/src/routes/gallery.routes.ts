@@ -247,5 +247,62 @@ async function processImageAsync(
             await fs.unlink(tempPath);
         } catch { }
     }
+
+    /**
+     * POST /api/galleries/:id/download-all
+     * Download all photos in a gallery as ZIP (requires email)
+     */
+    interface DownloadAllRequest {
+        Params: { id: string };
+        Body: { email: string };
+    }
+    fastify.post<DownloadAllRequest>('/:id/download-all', async (request, reply) => {
+        const { id } = request.params;
+        const { email } = request.body;
+
+        if (!email || !email.includes('@')) {
+            return reply.status(400).send({ error: 'Valid email required' });
+        }
+
+        // Get gallery with photos
+        const gallery = await GalleryService.getGalleryById(id, true);
+        if (!gallery) {
+            return reply.status(404).send({ error: 'Gallery not found' });
+        }
+
+        // Collect email
+        await EmailCollectionService.recordGalleryAccess(id, email);
+
+        // Import archiver
+        const archiver = require('archiver');
+
+        // Set response headers for ZIP download
+        reply.header('Content-Type', 'application/zip');
+        reply.header('Content-Disposition', `attachment; filename="${gallery.title.replace(/[^a-z0-9]/gi, '_')}.zip"`);
+
+        // Create ZIP archive
+        const archive = archiver('zip', {
+            zlib: { level: 9 } // Maximum compression
+        });
+
+        // Pipe archive to response
+        archive.pipe(reply.raw);
+
+        // Add each photo to the archive
+        for (const photo of gallery.photos) {
+            const photoPath = path.join(process.cwd(), 'storage', photo.file_path);
+            try {
+                await fs.access(photoPath);
+                archive.file(photoPath, { name: photo.filename });
+            } catch (err) {
+                request.log.warn(`Photo not found: ${photoPath}`);
+            }
+        }
+
+        // Finalize the archive
+        await archive.finalize();
+
+        return reply;
+    });
 }
 

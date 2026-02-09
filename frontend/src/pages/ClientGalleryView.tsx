@@ -5,6 +5,7 @@ import { clientApi } from '../services/api';
 import { useClientStore } from '../store/clientStore';
 import type { GalleryWithPhotos, Photo } from '../types';
 import SlideshowViewer from '../components/SlideshowViewer';
+import DownloadPinModal from '../components/DownloadPinModal';
 
 export default function ClientGalleryView() {
     const { id } = useParams<{ id: string }>();
@@ -17,6 +18,7 @@ export default function ClientGalleryView() {
     const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
     const [slideshowActive, setSlideshowActive] = useState(false);
     const [slideshowStartIndex, setSlideshowStartIndex] = useState(0);
+    const [showDownloadModal, setShowDownloadModal] = useState(false);
 
     const sessionId = useClientStore((state) => state.sessionId);
     const getGalleryToken = useClientStore((state) => state.getGalleryToken);
@@ -208,7 +210,7 @@ export default function ClientGalleryView() {
                             </button>
                             {gallery.allow_downloads && (
                                 <button
-                                    onClick={() => {/* handleDownloadAll logic needed later */ }}
+                                    onClick={() => setShowDownloadModal(true)}
                                     className="btn-secondary text-xs flex items-center gap-2"
                                 >
                                     <Download className="w-4 h-4" />
@@ -318,6 +320,15 @@ export default function ClientGalleryView() {
                     photos={gallery.photos}
                     startIndex={slideshowStartIndex}
                     onClose={() => setSlideshowActive(false)}
+                />
+            )}
+
+            {/* Download Modal */}
+            {showDownloadModal && gallery && (
+                <DownloadPinModal
+                    galleryId={gallery.id}
+                    galleryTitle={gallery.title}
+                    onClose={() => setShowDownloadModal(false)}
                 />
             )}
         </div>
