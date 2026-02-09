@@ -1,9 +1,10 @@
 exports.shorthands = undefined;
 
 exports.up = pgm => {
-    pgm.addColumns('galleries', {
-        cover_image_path: { type: 'text' },
-    });
+    pgm.sql(`
+        ALTER TABLE "galleries" 
+        ADD COLUMN IF NOT EXISTS "cover_image_path" text;
+    `);
 };
 
 exports.down = pgm => {

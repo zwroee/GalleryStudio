@@ -3,13 +3,13 @@
 exports.shorthands = undefined;
 
 exports.up = (pgm) => {
-    pgm.addColumns('admin_users', {
-        watermark_logo_path: {
-            type: 'varchar(255)',
-            default: null,
-            comment: 'Path to the watermark logo image',
-        },
-    });
+    pgm.sql(`
+        ALTER TABLE "admin_users" 
+        ADD COLUMN IF NOT EXISTS "watermark_logo_path" varchar(255) DEFAULT NULL;
+    `);
+    pgm.sql(`
+        COMMENT ON COLUMN "admin_users"."watermark_logo_path" IS 'Path to the watermark logo image';
+    `);
 };
 
 exports.down = (pgm) => {
