@@ -251,13 +251,22 @@ export class ImageProcessingService {
     ): Promise<sharp.Sharp> {
         try {
             console.log(`Applying watermark from: ${watermarkPath}`);
-            // Get image metadata to calculate positioning
+            // Get original image metadata
             const metadata = await image.metadata();
-            const imageWidth = metadata.width || maxSize;
-            const imageHeight = metadata.height || maxSize;
+            const originalWidth = metadata.width || maxSize;
+            const originalHeight = metadata.height || maxSize;
 
-            // Resize watermark to be 15% of image width
-            const watermarkWidth = Math.floor(imageWidth * 0.15);
+            // Calculate target dimensions after resizing (sharps 'fit: inside' logic)
+            // We must limit scale to 1 because of 'withoutEnlargement: true'
+            const scale = Math.min(maxSize / originalWidth, maxSize / originalHeight, 1);
+
+            const targetWidth = Math.round(originalWidth * scale);
+            const targetHeight = Math.round(originalHeight * scale);
+
+            console.log(`Target dims: ${targetWidth}x${targetHeight} (Original: ${originalWidth}x${originalHeight})`);
+
+            // Resize watermark to be 15% of TARGET width
+            const watermarkWidth = Math.max(Math.floor(targetWidth * 0.15), 50); // Ensure at least 50px if possible
 
             const watermarkBuffer = await sharp(watermarkPath)
                 .resize(watermarkWidth, null, {
@@ -271,9 +280,9 @@ export class ImageProcessingService {
             const wmWidth = watermarkMeta.width || watermarkWidth;
             const wmHeight = watermarkMeta.height || 50;
 
-            // Calculate bottom-center position
-            const left = Math.floor((imageWidth - wmWidth) / 2);
-            const top = imageHeight - wmHeight - Math.floor(imageHeight * 0.03); // 3% margin from bottom
+            // Calculate bottom-center position relative to TARGET dimensions
+            const left = Math.floor((targetWidth - wmWidth) / 2);
+            const top = targetHeight - wmHeight - Math.floor(targetHeight * 0.03); // 3% margin from bottom
 
             console.log(`Watermark position: top=${top}, left=${left}, width=${wmWidth}`);
 
