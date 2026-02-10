@@ -14,6 +14,12 @@ export class ImageProcessingService {
         filename: string,
         watermarkPath?: string | null
     ): Promise<ProcessedImage> {
+        console.log(`[ProcessImage] Starting for ${filename}`);
+        console.log(`[ProcessImage] Watermark path: ${watermarkPath || 'NONE'}`);
+        console.log(`[ProcessImage] Watermark exists: ${!!watermarkPath}`);
+        console.log(`[ProcessImage] Watermark type: ${typeof watermarkPath}`);
+        console.log(`[ProcessImage] Watermark value: ${JSON.stringify(watermarkPath)}`);
+
         // Ensure gallery directories exist
         await this.ensureGalleryDirectories(galleryId);
 
@@ -109,8 +115,14 @@ export class ImageProcessingService {
         let image = sharp(resizedBuffer);
 
         // Apply watermark if provided (now working with actual resized dimensions)
+        console.log(`[GeneratePreview] Watermark check: ${watermarkPath ? 'YES' : 'NO'}`);
+        console.log(`[GeneratePreview] Watermark path value: ${watermarkPath}`);
         if (watermarkPath) {
+            console.log(`[GeneratePreview] APPLYING watermark for ${filename}`);
             image = await this.applyWatermark(image, watermarkPath, config.previewSize);
+            console.log(`[GeneratePreview] Watermark applied successfully`);
+        } else {
+            console.log(`[GeneratePreview] SKIPPING watermark - path is falsy`);
         }
 
         await image.jpeg({ quality: config.imageQuality }).toFile(outputPath);
@@ -152,8 +164,13 @@ export class ImageProcessingService {
         let image = sharp(resizedBuffer);
 
         // Apply watermark if provided (now working with actual resized dimensions)
+        console.log(`[GenerateWebSize] Watermark check: ${watermarkPath ? 'YES' : 'NO'}`);
         if (watermarkPath) {
+            console.log(`[GenerateWebSize] APPLYING watermark`);
             image = await this.applyWatermark(image, watermarkPath, config.webSize);
+            console.log(`[GenerateWebSize] Watermark applied successfully`);
+        } else {
+            console.log(`[GenerateWebSize] SKIPPING watermark - path is falsy`);
         }
 
         await image.jpeg({ quality: config.imageQuality }).toFile(outputPath);
