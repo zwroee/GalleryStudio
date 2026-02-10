@@ -15,6 +15,7 @@ export default function AdminDashboard() {
     const [showUploadModal, setShowUploadModal] = useState(false);
     const [activeTab, setActiveTab] = useState<'galleries' | 'portfolio' | 'statistics' | 'settings'>('galleries');
     const [selectedImages, setSelectedImages] = useState<Set<string>>(new Set());
+    const [selectedGalleries, setSelectedGalleries] = useState<Set<string>>(new Set());
 
     const user = useAuthStore((state) => state.user);
     const logout = useAuthStore((state) => state.logout);
@@ -99,6 +100,61 @@ export default function AdminDashboard() {
         }
     };
 
+    // Gallery Bulk Actions
+    const toggleGallerySelection = (id: string, e: React.MouseEvent) => {
+        e.preventDefault(); // Prevent navigation
+        e.stopPropagation();
+        setSelectedGalleries(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(id)) {
+                newSet.delete(id);
+            } else {
+                newSet.add(id);
+            }
+            return newSet;
+        });
+    };
+
+    const toggleSelectAllGalleries = () => {
+        if (selectedGalleries.size === galleries.length) {
+            setSelectedGalleries(new Set());
+        } else {
+            setSelectedGalleries(new Set(galleries.map(g => g.id)));
+        }
+    };
+
+    const handleBulkDeleteGalleries = async () => {
+        if (selectedGalleries.size === 0) return;
+
+        const confirmed = confirm(`Are you sure you want to delete ${selectedGalleries.size} gallery${selectedGalleries.size !== 1 ? 'ies' : 'y'}? This cannot be undone.`);
+        if (!confirmed) return;
+
+        try {
+            const ids = Array.from(selectedGalleries);
+            await Promise.all(ids.map(id => galleryApi.delete(id)));
+            setSelectedGalleries(new Set());
+            loadGalleries();
+        } catch (err) {
+            console.error('Failed to delete galleries:', err);
+            alert('Failed to delete some galleries');
+        }
+    };
+
+    const handleBulkVisibility = async (isPublic: boolean) => {
+        if (selectedGalleries.size === 0) return;
+
+        try {
+            const ids = Array.from(selectedGalleries);
+            await Promise.all(ids.map(id => galleryApi.update(id, { is_public: isPublic })));
+            setSelectedGalleries(new Set());
+            loadGalleries();
+            alert(`Updated ${ids.length} galleries`);
+        } catch (err) {
+            console.error('Failed to update galleries:', err);
+            alert('Failed to update some galleries');
+        }
+    };
+
     // Watermark Upload
     const watermarkInputRef = useRef<HTMLInputElement>(null);
     const handleWatermarkUploadClick = () => {
@@ -158,8 +214,8 @@ export default function AdminDashboard() {
                     <button
                         onClick={() => setActiveTab('galleries')}
                         className={`px-6 py-3 font-medium transition-colors ${activeTab === 'galleries'
-                                ? 'text-primary-600 border-b-2 border-primary-600'
-                                : 'text-gray-600 hover:text-gray-900'
+                            ? 'text-primary-600 border-b-2 border-primary-600'
+                            : 'text-gray-600 hover:text-gray-900'
                             }`}
                     >
                         Galleries
@@ -167,16 +223,16 @@ export default function AdminDashboard() {
                     <button
                         onClick={() => setActiveTab('portfolio')}
                         className={`px-6 py-3 font-medium transition-colors ${activeTab === 'portfolio'
-                                ? 'text-primary-600 border-b-2 border-primary-600'
-                                : 'text-gray-600 hover:text-gray-900'
+                            ? 'text-primary-600 border-b-2 border-primary-600'
+                            : 'text-gray-600 hover:text-gray-900'
                             }`}
                     >Portfolio & Showcase
                     </button>
                     <button
                         onClick={() => setActiveTab('statistics')}
                         className={`px-6 py-3 font-medium transition-colors ${activeTab === 'statistics'
-                                ? 'text-primary-600 border-b-2 border-primary-600'
-                                : 'text-gray-600 hover:text-gray-900'
+                            ? 'text-primary-600 border-b-2 border-primary-600'
+                            : 'text-gray-600 hover:text-gray-900'
                             }`}
                     >
                         Statistics
@@ -184,8 +240,8 @@ export default function AdminDashboard() {
                     <button
                         onClick={() => setActiveTab('settings')}
                         className={`px-6 py-3 font-medium transition-colors ${activeTab === 'settings'
-                                ? 'text-primary-600 border-b-2 border-primary-600'
-                                : 'text-gray-600 hover:text-gray-900'
+                            ? 'text-primary-600 border-b-2 border-primary-600'
+                            : 'text-gray-600 hover:text-gray-900'
                             }`}
                     >Settings
                     </button>
@@ -194,7 +250,49 @@ export default function AdminDashboard() {
                 {activeTab === 'galleries' && (
                     <>
                         <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-semibold text-gray-900">Your Galleries</h2>
+                            <div className="flex items-center gap-4">
+                                <h2 className="text-xl font-semibold text-gray-900">Your Galleries</h2>
+                                {galleries.length > 0 && (
+                                    <>
+                                        <button
+                                            onClick={toggleSelectAllGalleries}
+                                            className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-2"
+                                        >
+                                            {selectedGalleries.size === galleries.length ? (
+                                                <CheckSquare className="w-4 h-4" />
+                                            ) : (
+                                                <Square className="w-4 h-4" />
+                                            )}
+                                            {selectedGalleries.size === galleries.length ? 'Deselect All' : 'Select All'}
+                                        </button>
+                                        {selectedGalleries.size > 0 && (
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={() => handleBulkVisibility(true)}
+                                                    className="btn-secondary text-sm py-1 px-3 flex items-center gap-1"
+                                                >
+                                                    <Eye className="w-3 h-3" />
+                                                    Make Public
+                                                </button>
+                                                <button
+                                                    onClick={() => handleBulkVisibility(false)}
+                                                    className="btn-secondary text-sm py-1 px-3 flex items-center gap-1"
+                                                >
+                                                    <Lock className="w-3 h-3" />
+                                                    Make Private
+                                                </button>
+                                                <button
+                                                    onClick={handleBulkDeleteGalleries}
+                                                    className="btn-danger text-sm py-1 px-3 flex items-center gap-1"
+                                                >
+                                                    <Trash2 className="w-3 h-3" />
+                                                    Delete ({selectedGalleries.size})
+                                                </button>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                            </div>
                             <button onClick={() => setShowCreateModal(true)} className="btn-primary flex items-center gap-2">
                                 <Plus className="w-5 h-5" />
                                 Create Gallery
@@ -221,8 +319,22 @@ export default function AdminDashboard() {
                                     <Link
                                         key={gallery.id}
                                         to={`/gallery-studio/admin/gallery/${gallery.id}`}
-                                        className="card hover:shadow-md transition-shadow group overflow-hidden"
+                                        className="card hover:shadow-md transition-shadow group overflow-hidden relative"
                                     >
+                                        {/* Selection Checkbox */}
+                                        <div className="absolute top-2 left-2 z-10">
+                                            <button
+                                                onClick={(e) => toggleGallerySelection(gallery.id, e)}
+                                                className="bg-white rounded shadow-sm p-1 hover:bg-gray-50 transition-colors"
+                                            >
+                                                {selectedGalleries.has(gallery.id) ? (
+                                                    <CheckSquare className="w-5 h-5 text-blue-600" />
+                                                ) : (
+                                                    <Square className="w-5 h-5 text-gray-400" />
+                                                )}
+                                            </button>
+                                        </div>
+
                                         {/* Cover Image or Placeholder */}
                                         <div className="w-full h-48 bg-gray-100 mb-4 rounded-lg overflow-hidden">
                                             {gallery.cover_image_path ? (
