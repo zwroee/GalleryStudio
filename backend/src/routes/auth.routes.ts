@@ -183,4 +183,49 @@ export default async function authRoutes(fastify: FastifyInstance) {
             return { error: 'Debug failed', details: err };
         }
     });
+});
+
+/**
+ * GET /api/auth/test-watermark
+ * Generate a test image with the user's watermark applied
+ */
+fastify.get('/test-watermark', async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+        // Get ANY admin user to check their watermark
+        const result = await pool.query('SELECT * FROM admin_users LIMIT 1');
+        const user = result.rows[0];
+
+        if (!user || !user.watermark_logo_path) {
+            return reply.status(404).send({ error: 'No watermark found for admin' });
+        }
+
+        const watermarkPath = path.join('/storage', user.watermark_logo_path);
+
+        // Create a grey background image
+        const width = 1000;
+        const height = 800;
+        let image = sharp({
+            create: {
+                width,
+                height,
+                channels: 3,
+                background: { r: 200, g: 200, b: 200 }
+            }
+        });
+
+        // Import ImageProcessingService dynamically to avoid circular deps if any
+        const { ImageProcessingService } = require('../services/image-processing.service');
+
+        // Apply watermark
+        image = await ImageProcessingService.applyWatermark(image, watermarkPath, width);
+
+        // Return as JPEG
+        const buffer = await image.jpeg().toBuffer();
+        reply.type('image/jpeg').send(buffer);
+
+    } catch (err) {
+        request.log.error(err);
+        return reply.status(500).send({ error: 'Test failed', details: err });
+    }
+});
 }

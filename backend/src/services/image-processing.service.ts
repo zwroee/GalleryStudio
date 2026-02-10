@@ -232,7 +232,7 @@ export class ImageProcessingService {
     /**
      * Apply watermark to image (bottom-center position)
      */
-    private static async applyWatermark(
+    public static async applyWatermark(
         image: sharp.Sharp,
         watermarkPath: string,
         maxSize: number
