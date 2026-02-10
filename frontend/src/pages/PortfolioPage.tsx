@@ -273,6 +273,7 @@ export default function PortfolioPage() {
                             ref={(el) => (imageRefs.current[index] = el)}
                             data-index={index}
                             className="break-inside-avoid relative group cursor-pointer"
+                            onClick={() => openLightbox(index)}
                             style={{
                                 opacity: visibleImages.has(index) ? 1 : 0,
                                 transform: visibleImages.has(index) ? 'translateY(0)' : 'translateY(30px)',
@@ -297,13 +298,6 @@ export default function PortfolioPage() {
                             {/* Hover Overlay */}
                             <div
                                 className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 pointer-events-none"
-                                onClick={() => openLightbox(index)}
-                            />
-                            {/* Make the whole container clickable */}
-                            <button
-                                className="absolute inset-0 w-full h-full cursor-pointer bg-transparent border-none appearance-none focus:outline-none focus:ring-2 focus:ring-white/50"
-                                onClick={() => openLightbox(index)}
-                                aria-label={`View photo ${index + 1}`}
                             />
                         </div>
                     ))}
