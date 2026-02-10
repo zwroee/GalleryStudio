@@ -102,4 +102,70 @@ export default async function authRoutes(fastify: FastifyInstance) {
             return reply.status(500).send({ error: 'Upload failed' });
         }
     });
+
+    /**
+     * GET /api/auth/debug-watermark
+     * Debug watermark path and existence
+     */
+    fastify.get('/debug-watermark', async (request: FastifyRequest, reply: FastifyReply) => {
+        try {
+            // Public debug for now - verify logic
+            // Get ANY admin user to check their watermark
+            const result = await require('../config/database').default.query('SELECT * FROM admin_users LIMIT 1');
+            const user = result.rows[0];
+
+            if (!user) {
+                return { error: 'No admin user found' };
+            }
+
+            const dbPath = user.watermark_logo_path;
+            if (!dbPath) {
+                return { status: 'no_watermark_in_db' };
+            }
+
+            const fullPath = require('path').join('/storage', dbPath);
+            let fileExists = false;
+            let fileStats = null;
+            let sharpMetadata = null;
+
+            try {
+                const stats = await require('fs').promises.stat(fullPath);
+                fileExists = true;
+                fileStats = {
+                    size: stats.size,
+                    uid: stats.uid,
+                    gid: stats.gid,
+                    mode: stats.mode
+                };
+            } catch (e) {
+                fileExists = false;
+            }
+
+            if (fileExists) {
+                try {
+                    const sharp = require('sharp');
+                    const meta = await sharp(fullPath).metadata();
+                    sharpMetadata = {
+                        format: meta.format,
+                        width: meta.width,
+                        height: meta.height
+                    };
+                } catch (e: any) {
+                    sharpMetadata = { error: e.message };
+                }
+            }
+
+            return {
+                status: 'checked',
+                db_path: dbPath,
+                full_path: fullPath,
+                file_exists: fileExists,
+                file_stats: fileStats,
+                sharp_readability: sharpMetadata
+            };
+
+        } catch (err) {
+            return { error: 'Debug failed', details: err };
+        }
+    });
 }
