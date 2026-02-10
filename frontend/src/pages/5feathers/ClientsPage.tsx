@@ -62,7 +62,7 @@ export default function ClientsPage() {
                                     className="ffp-client-card-image"
                                     style={{
                                         backgroundImage: gallery.cover_image_path
-                                            ? `url(${gallery.cover_image_path})`
+                                            ? `url(/storage/${gallery.cover_image_path})`
                                             : 'url(/5fp/placeholder.png)'
                                     }}
                                 />
