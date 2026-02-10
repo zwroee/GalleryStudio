@@ -97,13 +97,18 @@ export class ImageProcessingService {
             filename
         );
 
-        let image = sharp(sourcePath)
+        // First, resize the image to a buffer
+        const resizedBuffer = await sharp(sourcePath)
             .resize(config.previewSize, config.previewSize, {
                 fit: 'inside',
                 withoutEnlargement: true,
-            });
+            })
+            .toBuffer();
 
-        // Apply watermark if provided
+        // Now create a new sharp instance from the resized buffer
+        let image = sharp(resizedBuffer);
+
+        // Apply watermark if provided (now working with actual resized dimensions)
         if (watermarkPath) {
             image = await this.applyWatermark(image, watermarkPath, config.previewSize);
         }
@@ -135,13 +140,18 @@ export class ImageProcessingService {
             filename
         );
 
-        let image = sharp(sourcePath)
+        // First, resize the image to a buffer
+        const resizedBuffer = await sharp(sourcePath)
             .resize(config.webSize, config.webSize, {
                 fit: 'inside',
                 withoutEnlargement: true,
-            });
+            })
+            .toBuffer();
 
-        // Apply watermark if provided
+        // Now create a new sharp instance from the resized buffer
+        let image = sharp(resizedBuffer);
+
+        // Apply watermark if provided (now working with actual resized dimensions)
         if (watermarkPath) {
             image = await this.applyWatermark(image, watermarkPath, config.webSize);
         }
