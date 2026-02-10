@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Upload, Trash2, Settings, Copy, Check } from 'lucide-react';
+import { ArrowLeft, Upload, Trash2, Settings, Copy, Check, CheckSquare, Square } from 'lucide-react';
 import { galleryApi } from '../services/api';
 import type { GalleryWithPhotos } from '../types';
 import GallerySettingsModal from '../components/GallerySettingsModal';
@@ -17,6 +17,7 @@ export default function GalleryManagement() {
     const [uploadProgress, setUploadProgress] = useState(0);
     const [copied, setCopied] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
+    const [selectedPhotos, setSelectedPhotos] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         if (id) loadGallery();
@@ -79,6 +80,49 @@ export default function GalleryManagement() {
         } catch (err) {
             console.error('Failed to delete gallery:', err);
             alert('Failed to delete gallery');
+        }
+    };
+
+    // Bulk Photo Actions
+    const togglePhotoSelection = (photoId: string, e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setSelectedPhotos(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(photoId)) {
+                newSet.delete(photoId);
+            } else {
+                newSet.add(photoId);
+            }
+            return newSet;
+        });
+    };
+
+    const toggleSelectAll = () => {
+        if (!gallery) return;
+        if (selectedPhotos.size === gallery.photos.length) {
+            setSelectedPhotos(new Set());
+        } else {
+            setSelectedPhotos(new Set(gallery.photos.map(p => p.id)));
+        }
+    };
+
+    const handleBulkDelete = async () => {
+        if (!id || selectedPhotos.size === 0) return;
+
+        if (!confirm(`Are you sure you want to delete ${selectedPhotos.size} photo${selectedPhotos.size !== 1 ? 's' : ''}? This cannot be undone.`)) return;
+
+        try {
+            const photoIds = Array.from(selectedPhotos);
+            // Delete photos sequentially or we could add a bulk delete endpoint
+            // For now, doing it in parallel but client-side loop
+            await Promise.all(photoIds.map(photoId => galleryApi.deletePhoto(id, photoId)));
+
+            setSelectedPhotos(new Set());
+            await loadGallery();
+        } catch (err) {
+            console.error('Failed to delete photos:', err);
+            alert('Failed to delete some photos');
         }
     };
 
@@ -205,9 +249,37 @@ export default function GalleryManagement() {
 
                 {/* Photos Grid */}
                 <div>
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                        Photos ({gallery.photos.length})
-                    </h2>
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-lg font-semibold text-gray-900">
+                            Photos ({gallery.photos.length})
+                        </h2>
+
+                        {gallery.photos.length > 0 && (
+                            <div className="flex items-center gap-4">
+                                <button
+                                    onClick={toggleSelectAll}
+                                    className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-2"
+                                >
+                                    {selectedPhotos.size === gallery.photos.length ? (
+                                        <CheckSquare className="w-4 h-4" />
+                                    ) : (
+                                        <Square className="w-4 h-4" />
+                                    )}
+                                    {selectedPhotos.size === gallery.photos.length ? 'Deselect All' : 'Select All'}
+                                </button>
+
+                                {selectedPhotos.size > 0 && (
+                                    <button
+                                        onClick={handleBulkDelete}
+                                        className="btn-danger text-sm py-1 px-3 flex items-center gap-1"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                        Delete Selected ({selectedPhotos.size})
+                                    </button>
+                                )}
+                            </div>
+                        )}
+                    </div>
 
                     {gallery.photos.length === 0 ? (
                         <div className="card text-center py-12">
@@ -217,7 +289,20 @@ export default function GalleryManagement() {
                     ) : (
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             {gallery.photos.map((photo) => (
-                                <div key={photo.id} className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                                <div key={photo.id} className={`relative group aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 transition-colors ${selectedPhotos.has(photo.id) ? 'border-primary-500' : 'border-transparent'}`}>
+                                    {/* Selection Checkbox */}
+                                    <div className="absolute top-2 left-2 z-10">
+                                        <button
+                                            onClick={(e) => togglePhotoSelection(photo.id, e)}
+                                            className="bg-white rounded shadow-sm p-1 hover:bg-gray-50 transition-colors"
+                                        >
+                                            {selectedPhotos.has(photo.id) ? (
+                                                <CheckSquare className="w-5 h-5 text-blue-600" />
+                                            ) : (
+                                                <Square className="w-5 h-5 text-gray-400 border-gray-300" />
+                                            )}
+                                        </button>
+                                    </div>
                                     <img
                                         src={`/storage/galleries/${gallery.id}/thumbnail/${photo.filename}`}
                                         alt={photo.filename}
