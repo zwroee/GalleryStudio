@@ -66,42 +66,51 @@ export default async function portfolioRoutes(fastify: FastifyInstance) {
     fastify.post('/bulk', { onRequest: [authenticate] }, async (request, reply) => {
         try {
             const parts = request.parts();
-            const files: MultipartFile[] = [];
+            const tempFiles: { path: string; filename: string }[] = [];
             let category = 'WEDDING';
 
             // Collect all files and category
             for await (const part of parts) {
                 if (part.type === 'file') {
-                    files.push(part as MultipartFile);
+                    // We must consume the file stream immediately
+                    const tempPath = path.join(process.cwd(), 'temp', `upload-${Date.now()}-${part.filename}`);
+                    await fs.promises.mkdir(path.dirname(tempPath), { recursive: true });
+                    await pump(part.file, fs.createWriteStream(tempPath));
+
+                    tempFiles.push({
+                        path: tempPath,
+                        filename: part.filename
+                    });
                 } else if (part.type === 'field' && part.fieldname === 'category') {
                     category = part.value as string;
                 }
             }
 
-            if (files.length === 0) {
+            if (tempFiles.length === 0) {
                 return reply.status(400).send({ error: 'No files uploaded' });
             }
 
             const images = [];
 
-            // Process each file
-            for (const file of files) {
-                const tempPath = path.join(process.cwd(), 'temp', `upload-${Date.now()}-${file.filename}`);
-                await fs.promises.mkdir(path.dirname(tempPath), { recursive: true });
-                await pump(file.file, fs.createWriteStream(tempPath));
+            // Process each saved temp file
+            for (const file of tempFiles) {
+                try {
+                    // Process image
+                    const processed = await ImageProcessingService.processPortfolioImage(file.path, file.filename);
 
-                // Process image
-                const processed = await ImageProcessingService.processPortfolioImage(tempPath, file.filename);
+                    // Save to DB
+                    const image = await PortfolioService.addImage(
+                        processed.url,
+                        category,
+                        processed.width,
+                        processed.height
+                    );
 
-                // Save to DB
-                const image = await PortfolioService.addImage(
-                    processed.url,
-                    category,
-                    processed.width,
-                    processed.height
-                );
-
-                images.push(image);
+                    images.push(image);
+                } catch (err) {
+                    request.log.error({ err, file: file.filename }, 'Failed to process individual file in bulk upload');
+                    // Continue with other files even if one fails
+                }
             }
 
             return { images };
