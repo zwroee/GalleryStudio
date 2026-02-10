@@ -44,6 +44,7 @@ function App() {
                     isAuthenticated ? <GalleryManagement /> : <Navigate to="/gallery-studio/login" />
                 } />
                 <Route path="/gallery-studio/gallery/:id" element={<ClientGalleryView />} />
+                <Route path="/gallery/:id" element={<ClientGalleryView />} />
                 <Route path="/gallery-studio/portfolio" element={<PortfolioPage />} />
 
                 {/* Five Feathers Photography Routes (Public Website) */}
