@@ -56,6 +56,10 @@ async function registerRoutes() {
     await fastify.register(galleryRoutes.default, { prefix: '/api/galleries' });
     await fastify.register(clientRoutes.default, { prefix: '/api/client' });
     await fastify.register(portfolioRoutes.default, { prefix: '/api/portfolio' });
+
+    // Debug routes (temporary)
+    const debugRoutes = await import('./routes/debug.routes');
+    await fastify.register(debugRoutes.default, { prefix: '/api/debug' });
 }
 
 // Start server
