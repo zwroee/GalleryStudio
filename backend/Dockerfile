@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY package*.json ./
 # Clean install to ensure platform-specific binaries (especially for sharp)
-RUN npm ci --omit=dev
+RUN npm ci
 
 COPY . .
 RUN npm run build
