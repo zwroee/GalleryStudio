@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Share2, Facebook, Twitter, Link as LinkIcon, Check, X } from 'lucide-react';
+import { copyToClipboard } from '../utils/clipboard';
 
 interface ShareMenuProps {
     photoUrl: string;
@@ -15,7 +16,7 @@ export default function ShareMenu({ photoUrl, photoTitle, onClose }: ShareMenuPr
 
     const handleCopyLink = async () => {
         try {
-            await navigator.clipboard.writeText(shareUrl);
+            await copyToClipboard(shareUrl);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         } catch (err) {

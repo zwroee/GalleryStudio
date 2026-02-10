@@ -4,6 +4,7 @@ import { ArrowLeft, Upload, Trash2, Settings, Copy, Check } from 'lucide-react';
 import { galleryApi } from '../services/api';
 import type { GalleryWithPhotos } from '../types';
 import GallerySettingsModal from '../components/GallerySettingsModal';
+import { copyToClipboard } from '../utils/clipboard';
 
 export default function GalleryManagement() {
     const { id } = useParams<{ id: string }>();
@@ -81,11 +82,15 @@ export default function GalleryManagement() {
         }
     };
 
-    const copyGalleryLink = () => {
+    const copyGalleryLink = async () => {
         const link = `${window.location.origin}/gallery/${id}`;
-        navigator.clipboard.writeText(link);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        try {
+            await copyToClipboard(link);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+            alert('Failed to copy link');
+        }
     };
 
     const handleUpdateGallery = async (updatedData: any) => {
