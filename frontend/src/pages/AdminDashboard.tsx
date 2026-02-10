@@ -320,6 +320,21 @@ export default function AdminDashboard() {
                                         The watermark will be applied to all high-resolution downloads.
                                         For best results, use a high-quality PNG with transparency.
                                     </p>
+
+                                    {/* Watermark Preview */}
+                                    {user?.watermark_logo_path && (
+                                        <div className="mb-4">
+                                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Current Watermark</p>
+                                            <div className="bg-gray-100 p-4 rounded-lg border border-gray-200 inline-block">
+                                                <img
+                                                    src={`/storage/${user.watermark_logo_path}`}
+                                                    alt="Current Watermark"
+                                                    className="max-h-24 object-contain"
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+
                                     <button
                                         onClick={handleWatermarkUploadClick}
                                         className="btn-secondary flex items-center gap-2"

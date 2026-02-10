@@ -58,6 +58,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
                     id: user.id,
                     username: user.username,
                     email: user.email,
+                    watermark_logo_path: user.watermark_logo_path,
                 },
             };
         } catch (err) {
