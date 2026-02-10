@@ -165,7 +165,10 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
 
                 const user = request.user as { id: string };
                 const adminUser = await AuthService.getUserById(user.id);
-                const watermarkPath = adminUser?.watermark_logo_path || undefined;
+                // Fix: Prepend /storage to relative DB path so ImageProcessingService can find it
+                const watermarkPath = adminUser?.watermark_logo_path
+                    ? path.join('/storage', adminUser.watermark_logo_path)
+                    : undefined;
 
                 // Process image asynchronously using SAFE path
                 processImageAsync(galleryId, photo.id, safePath, filename, watermarkPath);

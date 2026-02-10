@@ -21,43 +21,21 @@ export default function DownloadPinModal({ galleryId, galleryTitle, onClose }: D
         }
 
         setIsDownloading(true);
-        setDownloadProgress(0);
+        setDownloadProgress(20); // Fake progress to show activity
 
-        try {
-            const response = await fetch(`/api/galleries/${galleryId}/download-all`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email }),
-            });
+        // Use direct download link to avoid Blob/HTTPS security issues
+        const downloadUrl = `/api/galleries/${galleryId}/download-all?email=${encodeURIComponent(email)}`;
 
-            if (!response.ok) {
-                throw new Error('Download failed');
-            }
+        // Use window.location to trigger native browser download
+        window.location.href = downloadUrl;
 
-            // Get the blob
-            const blob = await response.blob();
-
-            // Create download link
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${galleryTitle.replace(/[^a-z0-9]/gi, '_')}.zip`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-
+        // Close modal after a short delay
+        setTimeout(() => {
             setDownloadProgress(100);
             setTimeout(() => {
                 onClose();
-            }, 500);
-        } catch (err) {
-            console.error('Download failed:', err);
-            alert('Failed to download gallery. Please try again.');
-            setIsDownloading(false);
-        }
+            }, 1000);
+        }, 1500);
     };
 
     return (
