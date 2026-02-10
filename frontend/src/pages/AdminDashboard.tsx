@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, LogOut, Image as ImageIcon, Lock, Trash2, Upload, ExternalLink, Eye, Download, Heart, Settings, CheckSquare, Square } from 'lucide-react';
+import { Plus, LogOut, Image as ImageIcon, Lock, Trash2, Upload, ExternalLink, Eye, Download, Heart, Settings, CheckSquare, Square, BarChart3, TrendingUp, Users, Calendar } from 'lucide-react';
 import { galleryApi, authApi } from '../services/api';
 import { useAuthStore } from '../store/authStore';
 import { usePortfolioStore } from '../store/portfolioStore';
@@ -13,7 +13,7 @@ export default function AdminDashboard() {
     const [loading, setLoading] = useState(true);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showUploadModal, setShowUploadModal] = useState(false);
-    const [activeTab, setActiveTab] = useState<'galleries' | 'portfolio' | 'settings'>('galleries');
+    const [activeTab, setActiveTab] = useState<'galleries' | 'portfolio' | 'statistics' | 'settings'>('galleries');
     const [selectedImages, setSelectedImages] = useState<Set<string>>(new Set());
 
     const user = useAuthStore((state) => state.user);
@@ -154,35 +154,42 @@ export default function AdminDashboard() {
             {/* Main Content */}
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Tabs */}
-                <div className="flex items-center gap-6 mb-8 border-b border-gray-200">
+                <nav className="flex gap-1 border-b border-gray-200">
                     <button
                         onClick={() => setActiveTab('galleries')}
-                        className={`pb-4 text-sm font-medium transition-colors relative ${activeTab === 'galleries' ? 'text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}
+                        className={`px-6 py-3 font-medium transition-colors ${activeTab === 'galleries'
+                                ? 'text-primary-600 border-b-2 border-primary-600'
+                                : 'text-gray-600 hover:text-gray-900'
+                            }`}
                     >
-                        Client Galleries
-                        {activeTab === 'galleries' && (
-                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-600 rounded-t-full" />
-                        )}
+                        Galleries
                     </button>
                     <button
                         onClick={() => setActiveTab('portfolio')}
-                        className={`pb-4 text-sm font-medium transition-colors relative ${activeTab === 'portfolio' ? 'text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}
+                        className={`px-6 py-3 font-medium transition-colors ${activeTab === 'portfolio'
+                                ? 'text-primary-600 border-b-2 border-primary-600'
+                                : 'text-gray-600 hover:text-gray-900'
+                            }`}
+                    >Portfolio & Showcase
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('statistics')}
+                        className={`px-6 py-3 font-medium transition-colors ${activeTab === 'statistics'
+                                ? 'text-primary-600 border-b-2 border-primary-600'
+                                : 'text-gray-600 hover:text-gray-900'
+                            }`}
                     >
-                        Portfolio & Showcase
-                        {activeTab === 'portfolio' && (
-                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-600 rounded-t-full" />
-                        )}
+                        Statistics
                     </button>
                     <button
                         onClick={() => setActiveTab('settings')}
-                        className={`pb-4 text-sm font-medium transition-colors relative ${activeTab === 'settings' ? 'text-primary-600' : 'text-gray-500 hover:text-gray-700'}`}
-                    >
-                        Settings
-                        {activeTab === 'settings' && (
-                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-600 rounded-t-full" />
-                        )}
+                        className={`px-6 py-3 font-medium transition-colors ${activeTab === 'settings'
+                                ? 'text-primary-600 border-b-2 border-primary-600'
+                                : 'text-gray-600 hover:text-gray-900'
+                            }`}
+                    >Settings
                     </button>
-                </div>
+                </nav>
 
                 {activeTab === 'galleries' && (
                     <>
@@ -217,7 +224,7 @@ export default function AdminDashboard() {
                                         className="card hover:shadow-md transition-shadow group overflow-hidden"
                                     >
                                         {/* Cover Image or Placeholder */}
-                                        <div className="w-full h-48 bg-gray-100 mb-4 rounded-t-lg overflow-hidden -mx-6 -mt-6">
+                                        <div className="w-full h-48 bg-gray-100 mb-4 rounded-lg overflow-hidden">
                                             {gallery.cover_image_path ? (
                                                 <img
                                                     src={`/storage/${gallery.cover_image_path}`}
@@ -340,6 +347,187 @@ export default function AdminDashboard() {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'statistics' && (
+                    <div className="space-y-6">
+                        {/* Overview Stats */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                                <div className="flex items-center justify-between mb-2">
+                                    <h3 className="text-sm font-medium text-gray-600">Total Galleries</h3>
+                                    <ImageIcon className="w-5 h-5 text-primary-600" />
+                                </div>
+                                <p className="text-3xl font-bold text-gray-900">{galleries.length}</p>
+                                <p className="text-xs text-gray-500 mt-1">Active client galleries</p>
+                            </div>
+
+                            <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                                <div className="flex items-center justify-between mb-2">
+                                    <h3 className="text-sm font-medium text-gray-600">Total Photos</h3>
+                                    <ImageIcon className="w-5 h-5 text-blue-600" />
+                                </div>
+                                <p className="text-3xl font-bold text-gray-900">
+                                    {galleries.reduce((sum, g) => sum + (g.photo_count || 0), 0)}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">Across all galleries</p>
+                            </div>
+
+                            <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                                <div className="flex items-center justify-between mb-2">
+                                    <h3 className="text-sm font-medium text-gray-600">Portfolio Images</h3>
+                                    <Heart className="w-5 h-5 text-pink-600" />
+                                </div>
+                                <p className="text-3xl font-bold text-gray-900">{portfolioImages.length}</p>
+                                <p className="text-xs text-gray-500 mt-1">Public portfolio showcase</p>
+                            </div>
+
+                            <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                                <div className="flex items-center justify-between mb-2">
+                                    <h3 className="text-sm font-medium text-gray-600">Protected Galleries</h3>
+                                    <Lock className="w-5 h-5 text-amber-600" />
+                                </div>
+                                <p className="text-3xl font-bold text-gray-900">
+                                    {galleries.filter(g => g.password_hash).length}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">PIN protected</p>
+                            </div>
+                        </div>
+
+                        {/* Gallery Breakdown */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            {/* Gallery Stats */}
+                            <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                    <BarChart3 className="w-5 h-5 text-primary-600" />
+                                    Gallery Statistics
+                                </h3>
+                                <div className="space-y-4">
+                                    <div>
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-sm font-medium text-gray-700">Average Photos per Gallery</span>
+                                            <span className="text-sm font-bold text-gray-900">
+                                                {galleries.length > 0
+                                                    ? Math.round(galleries.reduce((sum, g) => sum + (g.photo_count || 0), 0) / galleries.length)
+                                                    : 0}
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-gray-200 rounded-full h-2">
+                                            <div
+                                                className="bg-primary-600 h-2 rounded-full"
+                                                style={{
+                                                    width: `${galleries.length > 0 ? Math.min((galleries.reduce((sum, g) => sum + (g.photo_count || 0), 0) / galleries.length / 100) * 100, 100) : 0}%`
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-sm font-medium text-gray-700">Galleries with Downloads Enabled</span>
+                                            <span className="text-sm font-bold text-gray-900">
+                                                {galleries.filter(g => g.allow_downloads).length}
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-gray-200 rounded-full h-2">
+                                            <div
+                                                className="bg-green-600 h-2 rounded-full"
+                                                style={{
+                                                    width: `${galleries.length > 0 ? (galleries.filter(g => g.allow_downloads).length / galleries.length) * 100 : 0}%`
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-sm font-medium text-gray-700">Galleries with Favorites Enabled</span>
+                                            <span className="text-sm font-bold text-gray-900">
+                                                {galleries.filter(g => g.allow_favorites).length}
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-gray-200 rounded-full h-2">
+                                            <div
+                                                className="bg-pink-600 h-2 rounded-full"
+                                                style={{
+                                                    width: `${galleries.length > 0 ? (galleries.filter(g => g.allow_favorites).length / galleries.length) * 100 : 0}%`
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Portfolio Breakdown */}
+                            <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                    <TrendingUp className="w-5 h-5 text-blue-600" />
+                                    Portfolio Breakdown
+                                </h3>
+                                <div className="space-y-3">
+                                    {['WEDDING', 'FAMILY', 'NEWBORN', 'MATERNITY', 'SENIOR', 'BRANDING'].map(category => {
+                                        const count = portfolioImages.filter(img => img.category === category).length;
+                                        const percentage = portfolioImages.length > 0 ? (count / portfolioImages.length) * 100 : 0;
+                                        return (
+                                            <div key={category}>
+                                                <div className="flex items-center justify-between mb-1">
+                                                    <span className="text-sm font-medium text-gray-700">{category}</span>
+                                                    <span className="text-sm font-bold text-gray-900">{count}</span>
+                                                </div>
+                                                <div className="w-full bg-gray-200 rounded-full h-2">
+                                                    <div
+                                                        className="bg-gradient-to-r from-primary-500 to-primary-600 h-2 rounded-full"
+                                                        style={{ width: `${percentage}%` }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Recent Activity */}
+                        <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                <Calendar className="w-5 h-5 text-purple-600" />
+                                Recent Galleries
+                            </h3>
+                            <div className="space-y-3">
+                                {galleries.slice(0, 5).map(gallery => (
+                                    <div key={gallery.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                        <div className="flex items-center gap-3">
+                                            {gallery.cover_image_path ? (
+                                                <img
+                                                    src={`/storage/${gallery.cover_image_path}`}
+                                                    alt={gallery.title}
+                                                    className="w-12 h-12 object-cover rounded"
+                                                />
+                                            ) : (
+                                                <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">
+                                                    <ImageIcon className="w-6 h-6 text-gray-400" />
+                                                </div>
+                                            )}
+                                            <div>
+                                                <h4 className="font-medium text-gray-900">{gallery.title}</h4>
+                                                <p className="text-xs text-gray-500">
+                                                    {gallery.photo_count || 0} photos • Created {new Date(gallery.created_at).toLocaleDateString()}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            {gallery.password_hash && <Lock className="w-4 h-4 text-gray-400" />}
+                                            {gallery.allow_downloads && <Download className="w-4 h-4 text-green-600" />}
+                                            {gallery.allow_favorites && <Heart className="w-4 h-4 text-pink-600" />}
+                                        </div>
+                                    </div>
+                                ))}
+                                {galleries.length === 0 && (
+                                    <p className="text-center text-gray-500 py-8">No galleries yet. Create your first gallery to see statistics!</p>
+                                )}
                             </div>
                         </div>
                     </div>
