@@ -79,14 +79,6 @@ export class ImageProcessingService {
         }
 
         return outputPath;
-
-        try {
-            await fs.chmod(outputPath, 0o644);
-        } catch (err) {
-            console.warn(`Failed to chmod ${outputPath}:`, err);
-        }
-
-        return outputPath;
     }
 
     /**
@@ -125,8 +117,6 @@ export class ImageProcessingService {
         }
 
         return outputPath;
-
-        return outputPath;
     }
 
     /**
@@ -163,8 +153,6 @@ export class ImageProcessingService {
         } catch (err) {
             console.warn(`Failed to chmod ${outputPath}:`, err);
         }
-
-        return outputPath;
 
         return outputPath;
     }
