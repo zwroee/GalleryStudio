@@ -125,6 +125,11 @@ export const galleryApi = {
 
 // Client API (for gallery viewing)
 export const clientApi = {
+    getPublicGalleries: async (): Promise<{ galleries: Gallery[] }> => {
+        const { data } = await api.get('/client/galleries');
+        return data;
+    },
+
     verifyPassword: async (
         galleryId: string,
         password: string,

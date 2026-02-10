@@ -16,6 +16,7 @@ export default function GallerySettingsModal({ onClose, onSave, gallery }: Galle
         password: '',
         allow_downloads: gallery.allow_downloads,
         allow_favorites: gallery.allow_favorites,
+        is_public: gallery.is_public ?? false,
         expires_at: gallery.expires_at ? new Date(gallery.expires_at).toISOString().split('T')[0] : '',
     });
     const [showPassword, setShowPassword] = useState(false);
@@ -55,6 +56,7 @@ export default function GallerySettingsModal({ onClose, onSave, gallery }: Galle
                 description: formData.description || null,
                 allow_downloads: formData.allow_downloads,
                 allow_favorites: formData.allow_favorites,
+                is_public: formData.is_public,
                 expires_at: formData.expires_at ? new Date(formData.expires_at).toISOString() : null,
                 cover_image_file: coverImageFile, // Pass file for upload
             };
@@ -250,10 +252,10 @@ export default function GallerySettingsModal({ onClose, onSave, gallery }: Galle
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2">
                                         <Download className="w-4 h-4 text-neutral-600" />
-                                        <span className="text-sm font-medium text-neutral-900 font-sans">Allow Downloads</span>
+                                        <span className="font-medium text-neutral-900 font-sans">Allow Downloads</span>
                                     </div>
                                     <p className="text-xs text-neutral-500 mt-1 font-sans">
-                                        Clients can download watermarked web-size images
+                                        Clients can download photos from this gallery
                                     </p>
                                 </div>
                             </label>
@@ -268,10 +270,28 @@ export default function GallerySettingsModal({ onClose, onSave, gallery }: Galle
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2">
                                         <Heart className="w-4 h-4 text-neutral-600" />
-                                        <span className="text-sm font-medium text-neutral-900 font-sans">Allow Favorites</span>
+                                        <span className="font-medium text-neutral-900 font-sans">Allow Favorites</span>
                                     </div>
                                     <p className="text-xs text-neutral-500 mt-1 font-sans">
                                         Clients can mark photos as favorites
+                                    </p>
+                                </div>
+                            </label>
+
+                            <label className="flex items-center gap-3 cursor-pointer group p-3 rounded-sm hover:bg-neutral-50 transition-colors">
+                                <input
+                                    type="checkbox"
+                                    checked={formData.is_public}
+                                    onChange={(e) => setFormData({ ...formData, is_public: e.target.checked })}
+                                    className="w-4 h-4 text-neutral-900 border-neutral-300 rounded"
+                                />
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-2">
+                                        <Eye className="w-4 h-4 text-neutral-600" />
+                                        <span className="font-medium text-neutral-900 font-sans">Make Public</span>
+                                    </div>
+                                    <p className="text-xs text-neutral-500 mt-1 font-sans">
+                                        Show this gallery on the public client galleries page (/5feathers/clients)
                                     </p>
                                 </div>
                             </label>

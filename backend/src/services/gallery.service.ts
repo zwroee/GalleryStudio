@@ -22,6 +22,23 @@ export class GalleryService {
     }
 
     /**
+     * Get all public galleries (for client view)
+     */
+    static async getPublicGalleries(): Promise<Gallery[]> {
+        const result = await pool.query<Gallery>(
+            `SELECT g.*, 
+                COUNT(DISTINCT p.id)::int as photo_count
+       FROM galleries g
+       LEFT JOIN photos p ON g.id = p.gallery_id AND p.processing_status = 'completed'
+       WHERE g.is_public = true
+       GROUP BY g.id
+       ORDER BY g.created_at DESC`
+        );
+
+        return result.rows;
+    }
+
+    /**
      * Get gallery by ID with photos
      */
     static async getGalleryById(id: string, includePhotos = true): Promise<GalleryWithPhotos | null> {
@@ -67,8 +84,8 @@ export class GalleryService {
             : null;
 
         const result = await pool.query<Gallery>(
-            `INSERT INTO galleries (title, description, password_hash, allow_downloads, allow_favorites)
-       VALUES ($1, $2, $3, $4, $5)
+            `INSERT INTO galleries (title, description, password_hash, allow_downloads, allow_favorites, is_public)
+       VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
             [
                 data.title,
@@ -76,6 +93,7 @@ export class GalleryService {
                 passwordHash,
                 data.allow_downloads ?? true,
                 data.allow_favorites ?? true,
+                data.is_public ?? false,
             ]
         );
 
@@ -121,6 +139,11 @@ export class GalleryService {
         if (data.cover_image_path !== undefined) {
             updates.push(`cover_image_path = $${paramCount++}`);
             values.push(data.cover_image_path);
+        }
+
+        if (data.is_public !== undefined) {
+            updates.push(`is_public = $${paramCount++}`);
+            values.push(data.is_public);
         }
 
         if (updates.length === 0) {
@@ -207,5 +230,15 @@ export class GalleryService {
         );
 
         return result.rows[0] || null;
+    }
+
+    /**
+     * Increment view count for a gallery
+     */
+    static async incrementViewCount(galleryId: string): Promise<void> {
+        await pool.query(
+            'UPDATE galleries SET view_count = view_count + 1 WHERE id = $1',
+            [galleryId]
+        );
     }
 }

@@ -11,13 +11,13 @@ import AdminDashboard from './pages/AdminDashboard';
 import GalleryManagement from './pages/GalleryManagement';
 import ClientGalleryView from './pages/ClientGalleryView';
 import PortfolioPage from './pages/PortfolioPage';
+import PublicGalleriesPage from './pages/PublicGalleriesPage';
 
 // Five Feathers Photography Pages
 import HomePage from './pages/5feathers/HomePage';
 import AboutPage from './pages/5feathers/AboutPage';
 import PortfolioHomePage from './pages/5feathers/PortfolioHomePage';
 import InvestmentPage from './pages/5feathers/InvestmentPage';
-import ClientsPage from './pages/5feathers/ClientsPage';
 import ContactPage from './pages/5feathers/ContactPage';
 
 // Wrapper to handle scroll animations on route change
@@ -52,7 +52,7 @@ function App() {
                 <Route path="/5feathers/about" element={<AboutPage />} />
                 <Route path="/5feathers/portfolio" element={<PortfolioHomePage />} />
                 <Route path="/5feathers/investment" element={<InvestmentPage />} />
-                <Route path="/5feathers/clients" element={<ClientsPage />} />
+                <Route path="/5feathers/clients" element={<PublicGalleriesPage />} />
                 <Route path="/5feathers/contact" element={<ContactPage />} />
             </Routes>
         </BrowserRouter>

@@ -73,6 +73,7 @@ export interface CreateGalleryRequest {
     password?: string;
     allow_downloads?: boolean;
     allow_favorites?: boolean;
+    is_public?: boolean;
 }
 
 export interface UpdateGalleryRequest {
@@ -81,6 +82,7 @@ export interface UpdateGalleryRequest {
     password?: string | null;
     allow_downloads?: boolean;
     allow_favorites?: boolean;
+    is_public?: boolean;
     expires_at?: string | null;
     cover_image?: string | null;
     cover_image_path?: string | null;

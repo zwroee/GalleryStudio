@@ -7,6 +7,19 @@ import { verifyPasswordSchema, validateBody } from '../middleware/validation';
 
 export default async function clientRoutes(fastify: FastifyInstance) {
     /**
+     * GET /api/client/galleries
+     * Get all public galleries
+     */
+    fastify.get('/galleries', async (request: FastifyRequest, reply: FastifyReply) => {
+        const galleries = await GalleryService.getPublicGalleries();
+
+        // Remove password hashes from response
+        const sanitizedGalleries = galleries.map(({ password_hash, download_pin, ...gallery }) => gallery);
+
+        return { galleries: sanitizedGalleries };
+    });
+
+    /**
      * POST /api/client/galleries/:id/verify
      * Verify gallery password and get session token
      * Also collects client email for marketing purposes
@@ -66,6 +79,9 @@ export default async function clientRoutes(fastify: FastifyInstance) {
         if (!gallery) {
             return reply.status(404).send({ error: 'Gallery not found' });
         }
+
+        // Increment view count
+        await GalleryService.incrementViewCount(galleryId);
 
         // Gallery is now publicly viewable - password protection moved to downloads only
 
