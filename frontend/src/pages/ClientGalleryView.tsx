@@ -11,9 +11,6 @@ export default function ClientGalleryView() {
     const { id } = useParams<{ id: string }>();
     const [gallery, setGallery] = useState<GalleryWithPhotos | null>(null);
     const [loading, setLoading] = useState(true);
-    const [password, setPassword] = useState('');
-    const [email, setEmail] = useState('');
-    const [passwordRequired, setPasswordRequired] = useState(false);
     const [error, setError] = useState('');
     const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
     const [slideshowActive, setSlideshowActive] = useState(false);
@@ -21,8 +18,6 @@ export default function ClientGalleryView() {
     const [showDownloadModal, setShowDownloadModal] = useState(false);
 
     const sessionId = useClientStore((state) => state.sessionId);
-    const getGalleryToken = useClientStore((state) => state.getGalleryToken);
-    const setGalleryToken = useClientStore((state) => state.setGalleryToken);
 
     useEffect(() => {
         if (id) loadGallery();
@@ -32,32 +27,13 @@ export default function ClientGalleryView() {
         if (!id) return;
 
         try {
-            const token = getGalleryToken(id);
-            const response = await clientApi.getGallery(id, token, sessionId);
+            // Gallery is now publicly viewable - no password required
+            const response = await clientApi.getGallery(id, undefined, sessionId);
             setGallery(response.gallery);
-            setPasswordRequired(false);
         } catch (err: any) {
-            if (err.response?.status === 401) {
-                setPasswordRequired(true);
-            } else {
-                setError('Failed to load gallery');
-            }
+            setError('Failed to load gallery');
         } finally {
             setLoading(false);
-        }
-    };
-
-    const handlePasswordSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!id) return;
-
-        setError('');
-        try {
-            const response = await clientApi.verifyPassword(id, password, email);
-            setGalleryToken(id, response.sessionToken);
-            await loadGallery();
-        } catch (err: any) {
-            setError(err.response?.data?.error || 'Invalid password');
         }
     };
 
@@ -103,65 +79,6 @@ export default function ClientGalleryView() {
 
         setSelectedPhoto(gallery.photos[newIndex]);
     };
-
-    // Password prompt
-    if (passwordRequired) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100">
-                <div className="card max-w-md w-full">
-                    <div className="text-center mb-6">
-                        <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600 rounded-full mb-4">
-                            <Lock className="w-8 h-8 text-white" />
-                        </div>
-                        <h1 className="text-2xl font-bold text-gray-900">Password Protected</h1>
-                        <p className="text-gray-600 mt-2">This gallery requires a password to view</p>
-                    </div>
-
-                    <form onSubmit={handlePasswordSubmit} className="space-y-4">
-                        {error && (
-                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-                                {error}
-                            </div>
-                        )}
-
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                                Email Address
-                            </label>
-                            <input
-                                type="email"
-                                id="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="your@email.com"
-                                className="input-field"
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                                Password
-                            </label>
-                            <input
-                                type="password"
-                                id="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder="Enter password"
-                                className="input-field"
-                                autoFocus
-                                required
-                            />
-                        </div>
-
-                        <button type="submit" className="btn-primary w-full">
-                            Access Gallery
-                        </button>
-                    </form>
-                </div>
-            </div>
-        );
-    }
 
     // Loading state
     if (loading) {

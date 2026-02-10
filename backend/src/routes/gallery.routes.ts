@@ -225,11 +225,11 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
      */
     interface DownloadAllRequest {
         Params: { id: string };
-        Querystring: { email: string };
+        Querystring: { email: string; pin?: string };
     }
     fastify.get<DownloadAllRequest>('/:id/download-all', async (request, reply) => {
         const { id } = request.params;
-        const { email } = request.query;
+        const { email, pin } = request.query;
 
         if (!email || !email.includes('@')) {
             return reply.status(400).send({ error: 'Valid email required' });
@@ -239,6 +239,16 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
         const gallery = await GalleryService.getGalleryById(id, true);
         if (!gallery) {
             return reply.status(404).send({ error: 'Gallery not found' });
+        }
+
+        // Check if PIN is required and verify it
+        if (gallery.download_pin) {
+            if (!pin) {
+                return reply.status(401).send({ error: 'PIN required for download' });
+            }
+            if (pin !== gallery.download_pin) {
+                return reply.status(401).send({ error: 'Invalid PIN' });
+            }
         }
 
         // Record usage

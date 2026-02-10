@@ -4,6 +4,7 @@ export interface Gallery {
     title: string;
     description: string | null;
     password_hash: string | null;
+    download_pin: string | null;
     allow_downloads: boolean;
     allow_favorites: boolean;
     expires_at: Date | null;

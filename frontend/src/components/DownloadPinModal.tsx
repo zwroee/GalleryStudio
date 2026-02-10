@@ -8,22 +8,25 @@ interface DownloadPinModalProps {
 
 export default function DownloadPinModal({ galleryId, onClose }: DownloadPinModalProps) {
     const [email, setEmail] = useState('');
+    const [pin, setPin] = useState('');
     const [isDownloading, setIsDownloading] = useState(false);
     const [downloadProgress, setDownloadProgress] = useState(0);
+    const [error, setError] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!email || !email.includes('@')) {
-            alert('Please enter a valid email address');
+            setError('Please enter a valid email address');
             return;
         }
 
+        setError('');
         setIsDownloading(true);
         setDownloadProgress(20); // Fake progress to show activity
 
-        // Use direct download link to avoid Blob/HTTPS security issues
-        const downloadUrl = `/api/galleries/${galleryId}/download-all?email=${encodeURIComponent(email)}`;
+        // Use direct download link with PIN
+        const downloadUrl = `/api/galleries/${galleryId}/download-all?email=${encodeURIComponent(email)}&pin=${encodeURIComponent(pin)}`;
 
         // Use window.location to trigger native browser download
         window.location.href = downloadUrl;
@@ -56,6 +59,12 @@ export default function DownloadPinModal({ galleryId, onClose }: DownloadPinModa
 
                 {!isDownloading ? (
                     <form onSubmit={handleSubmit} className="space-y-4">
+                        {error && (
+                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                                {error}
+                            </div>
+                        )}
+
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Email Address
@@ -68,6 +77,19 @@ export default function DownloadPinModal({ galleryId, onClose }: DownloadPinModa
                                 placeholder="your@email.com"
                                 required
                                 autoFocus
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                PIN (if required)
+                            </label>
+                            <input
+                                type="text"
+                                value={pin}
+                                onChange={(e) => setPin(e.target.value)}
+                                className="input-field"
+                                placeholder="Enter PIN"
                             />
                         </div>
 

@@ -67,25 +67,7 @@ export default async function clientRoutes(fastify: FastifyInstance) {
             return reply.status(404).send({ error: 'Gallery not found' });
         }
 
-        // Check if gallery is password protected
-        if (gallery.password_hash) {
-            // Verify session token
-            const authHeader = request.headers.authorization;
-            if (!authHeader) {
-                return reply.status(401).send({ error: 'Password required' });
-            }
-
-            try {
-                const token = authHeader.replace('Bearer ', '');
-                const decoded = fastify.jwt.verify(token) as { galleryId: string; type: string };
-
-                if (decoded.galleryId !== galleryId || decoded.type !== 'client') {
-                    return reply.status(401).send({ error: 'Invalid session' });
-                }
-            } catch {
-                return reply.status(401).send({ error: 'Invalid session' });
-            }
-        }
+        // Gallery is now publicly viewable - password protection moved to downloads only
 
         // Get favorite statuses for this session
         const photoIds = gallery.photos.map(p => p.id);
