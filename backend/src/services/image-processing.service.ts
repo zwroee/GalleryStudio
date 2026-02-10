@@ -250,6 +250,7 @@ export class ImageProcessingService {
         maxSize: number
     ): Promise<void> {
         try {
+            console.log(`Applying watermark from: ${watermarkPath}`);
             // Get image metadata to calculate positioning
             const metadata = await image.metadata();
             const imageWidth = metadata.width || maxSize;
@@ -273,6 +274,8 @@ export class ImageProcessingService {
             // Calculate bottom-center position
             const left = Math.floor((imageWidth - wmWidth) / 2);
             const top = imageHeight - wmHeight - Math.floor(imageHeight * 0.03); // 3% margin from bottom
+
+            console.log(`Watermark position: top=${top}, left=${left}, width=${wmWidth}`);
 
             // Composite watermark onto image
             await image.composite([{

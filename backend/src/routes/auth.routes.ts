@@ -88,6 +88,17 @@ export default async function authRoutes(fastify: FastifyInstance) {
             // Ensure directory exists
             await require('fs').promises.mkdir(uploadDir, { recursive: true });
 
+            // Delete old watermark if exists
+            const user = await AuthService.getUserById(payload.id);
+            if (user && user.watermark_logo_path) {
+                const oldPath = require('path').join('/storage', user.watermark_logo_path);
+                try {
+                    await require('fs').promises.unlink(oldPath);
+                } catch (err) {
+                    request.log.warn(`Failed to delete old watermark: ${oldPath}`);
+                }
+            }
+
             // Save file
             await require('fs').promises.writeFile(filePath, buffer);
 
