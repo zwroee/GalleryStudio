@@ -22,8 +22,12 @@ export class ImageProcessingService {
         const { width = 0, height = 0, format } = metadata;
 
         // Determine output format (convert HEIC/RAW to JPEG)
-        const outputFormat = this.shouldConvertFormat(format) ? 'jpeg' : format || 'jpeg';
-        const outputFilename = this.changeExtension(filename, outputFormat);
+        const shouldConvert = this.shouldConvertFormat(format);
+        const outputFormat = shouldConvert ? 'jpeg' : format || 'jpeg';
+
+        // Only change extension if we are converting format
+        // This preserves .jpg vs .jpeg to match frontend expectations
+        const outputFilename = shouldConvert ? this.changeExtension(filename, outputFormat) : filename;
 
         // Generate all image sizes
         const sizes: ImageSizes = {
