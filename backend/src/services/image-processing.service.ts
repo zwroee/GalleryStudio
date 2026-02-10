@@ -105,7 +105,7 @@ export class ImageProcessingService {
             filename
         );
 
-        const image = sharp(sourcePath)
+        let image = sharp(sourcePath)
             .resize(config.previewSize, config.previewSize, {
                 fit: 'inside',
                 withoutEnlargement: true,
@@ -113,7 +113,7 @@ export class ImageProcessingService {
 
         // Apply watermark if provided
         if (watermarkPath) {
-            await this.applyWatermark(image, watermarkPath, config.previewSize);
+            image = await this.applyWatermark(image, watermarkPath, config.previewSize);
         }
 
         await image.jpeg({ quality: config.imageQuality }).toFile(outputPath);
@@ -145,7 +145,7 @@ export class ImageProcessingService {
             filename
         );
 
-        const image = sharp(sourcePath)
+        let image = sharp(sourcePath)
             .resize(config.webSize, config.webSize, {
                 fit: 'inside',
                 withoutEnlargement: true,
@@ -153,7 +153,7 @@ export class ImageProcessingService {
 
         // Apply watermark if provided
         if (watermarkPath) {
-            await this.applyWatermark(image, watermarkPath, config.webSize);
+            image = await this.applyWatermark(image, watermarkPath, config.webSize);
         }
 
         await image.jpeg({ quality: config.imageQuality }).toFile(outputPath);
@@ -248,7 +248,7 @@ export class ImageProcessingService {
         image: sharp.Sharp,
         watermarkPath: string,
         maxSize: number
-    ): Promise<void> {
+    ): Promise<sharp.Sharp> {
         try {
             console.log(`Applying watermark from: ${watermarkPath}`);
             // Get image metadata to calculate positioning
@@ -277,15 +277,16 @@ export class ImageProcessingService {
 
             console.log(`Watermark position: top=${top}, left=${left}, width=${wmWidth}`);
 
-            // Composite watermark onto image
-            await image.composite([{
+            // Composite watermark onto image and RETURN the new instance
+            return image.composite([{
                 input: watermarkBuffer,
                 top,
                 left,
             }]);
         } catch (err) {
             console.error('Failed to apply watermark:', err);
-            // Continue without watermark if it fails
+            // Return original image if watermark fails
+            return image;
         }
     }
 
