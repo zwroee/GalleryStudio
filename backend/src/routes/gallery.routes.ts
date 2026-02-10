@@ -338,10 +338,9 @@ async function processImageAsync(
         const photo = await GalleryService.getPhotoById(photoId);
         if (photo) {
             // Update with actual metadata from processing
-            // Store path relative to storage root (e.g. "galleries/123/original/img.jpg")
-            // This corresponds to http://host/storage/galleries/123/original/img.jpg
-            // Since Nginx aliases /storage/ to /storage/, we want the path inside /storage/
-            path.relative('/storage', processed.sizes.original).replace(/\\/g, '/'),
+            await updatePhotoMetadata(
+                photoId,
+                path.relative('/storage', processed.sizes.original).replace(/\\/g, '/'),
                 processed.width,
                 processed.height,
                 processed.fileSize,
