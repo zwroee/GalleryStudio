@@ -40,22 +40,9 @@ export default async function portfolioRoutes(fastify: FastifyInstance) {
             // Process image
             const processed = await ImageProcessingService.processPortfolioImage(tempPath, data.filename);
 
-            // Get category from fields if present, default to 'ALL'
-            // Multipart fields are a bit tricky pending implementation details, defaulting to ALL for now
-            // In a real multipart form, we'd parse fields too. 
-            // For simplicity, we'll assume category is passed as a query param or default to ALL
-            // Or we can parse the parts. fastify-multipart handles this.
-            // But let's just default to ALL and let user update it later if needed?
-            // Or extract from fields...
-            // Let's check if fields are available. 
-            // data.fields is available if addToBody is true, but here we are streaming.
-
-            // Simplification: Default to 'ALL', user can organize later? 
-            // Or we can attach category in the form data.
-            // Since we use request.file(), we are iterating parts.
-            // We'll stick to 'ALL' for now for simplicity.
-
-            const category = 'ALL';
+            // Get category from fields
+            const fields = data.fields as any;
+            const category = fields?.category?.value || 'WEDDING';
 
             // Save to DB
             const image = await PortfolioService.addImage(
@@ -69,6 +56,58 @@ export default async function portfolioRoutes(fastify: FastifyInstance) {
         } catch (err) {
             request.log.error(err);
             return reply.status(500).send({ error: 'Upload failed' });
+        }
+    });
+
+    /**
+     * POST /api/portfolio/bulk
+     * Upload multiple portfolio images (admin only)
+     */
+    fastify.post('/bulk', { onRequest: [authenticate] }, async (request, reply) => {
+        try {
+            const parts = request.parts();
+            const files: MultipartFile[] = [];
+            let category = 'WEDDING';
+
+            // Collect all files and category
+            for await (const part of parts) {
+                if (part.type === 'file') {
+                    files.push(part as MultipartFile);
+                } else if (part.type === 'field' && part.fieldname === 'category') {
+                    category = part.value as string;
+                }
+            }
+
+            if (files.length === 0) {
+                return reply.status(400).send({ error: 'No files uploaded' });
+            }
+
+            const images = [];
+
+            // Process each file
+            for (const file of files) {
+                const tempPath = path.join(process.cwd(), 'temp', `upload-${Date.now()}-${file.filename}`);
+                await fs.promises.mkdir(path.dirname(tempPath), { recursive: true });
+                await pump(file.file, fs.createWriteStream(tempPath));
+
+                // Process image
+                const processed = await ImageProcessingService.processPortfolioImage(tempPath, file.filename);
+
+                // Save to DB
+                const image = await PortfolioService.addImage(
+                    processed.url,
+                    category,
+                    processed.width,
+                    processed.height
+                );
+
+                images.push(image);
+            }
+
+            return { images };
+        } catch (err) {
+            request.log.error(err);
+            return reply.status(500).send({ error: 'Bulk upload failed' });
         }
     });
 
@@ -91,5 +130,41 @@ export default async function portfolioRoutes(fastify: FastifyInstance) {
         await ImageProcessingService.deletePortfolioImage(url);
 
         return { success: true };
+    });
+
+    /**
+     * POST /api/portfolio/bulk-delete
+     * Delete multiple portfolio images (admin only)
+     */
+    interface BulkDeleteRequest {
+        Body: { ids: string[] };
+    }
+    fastify.post<BulkDeleteRequest>('/bulk-delete', { onRequest: [authenticate] }, async (request, reply) => {
+        const { ids } = request.body;
+
+        if (!ids || ids.length === 0) {
+            return reply.status(400).send({ error: 'No image IDs provided' });
+        }
+
+        try {
+            const deletedUrls = [];
+
+            for (const id of ids) {
+                const url = await PortfolioService.deleteImage(id);
+                if (url) {
+                    deletedUrls.push(url);
+                }
+            }
+
+            // Delete files
+            for (const url of deletedUrls) {
+                await ImageProcessingService.deletePortfolioImage(url);
+            }
+
+            return { success: true, deleted: deletedUrls.length };
+        } catch (err) {
+            request.log.error(err);
+            return reply.status(500).send({ error: 'Bulk delete failed' });
+        }
     });
 }

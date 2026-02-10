@@ -38,8 +38,10 @@ interface PortfolioState {
     // Actions
     fetchImages: () => Promise<void>;
     updateProfile: (data: Partial<PortfolioState>) => void;
-    uploadImage: (file: File) => Promise<void>;
+    uploadImage: (file: File, category?: string) => Promise<void>;
+    uploadImages: (files: File[], category: string, onProgress?: (progress: number) => void) => Promise<void>;
     removeImage: (id: string) => Promise<void>;
+    removeImages: (ids: string[]) => Promise<void>;
 }
 
 export const usePortfolioStore = create<PortfolioState>()(
@@ -69,11 +71,14 @@ export const usePortfolioStore = create<PortfolioState>()(
 
             updateProfile: (data) => set((state) => ({ ...state, ...data })),
 
-            uploadImage: async (file: File) => {
+            uploadImage: async (file: File, category?: string) => {
                 set({ isLoading: true, error: null });
                 try {
                     const formData = new FormData();
                     formData.append('file', file);
+                    if (category) {
+                        formData.append('category', category);
+                    }
 
                     const response = await api.post('/portfolio', formData, {
                         headers: {
@@ -92,6 +97,38 @@ export const usePortfolioStore = create<PortfolioState>()(
                 }
             },
 
+            uploadImages: async (files: File[], category: string, onProgress?: (progress: number) => void) => {
+                set({ isLoading: true, error: null });
+                try {
+                    const formData = new FormData();
+                    files.forEach((file) => {
+                        formData.append('files', file);
+                    });
+                    formData.append('category', category);
+
+                    const response = await api.post('/portfolio/bulk', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                        onUploadProgress: (progressEvent) => {
+                            if (progressEvent.total) {
+                                const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                                onProgress?.(progress);
+                            }
+                        },
+                    });
+
+                    set((state) => ({
+                        images: [...response.data.images, ...state.images],
+                        isLoading: false
+                    }));
+                } catch (err) {
+                    console.error('Failed to upload images:', err);
+                    set({ error: 'Failed to upload images', isLoading: false });
+                    throw err;
+                }
+            },
+
             removeImage: async (id: string) => {
                 // Optimistic update
                 const previousImages = get().images;
@@ -105,6 +142,23 @@ export const usePortfolioStore = create<PortfolioState>()(
                     console.error('Failed to delete image:', err);
                     // Revert on failure
                     set({ images: previousImages, error: 'Failed to delete image' });
+                    throw err;
+                }
+            },
+
+            removeImages: async (ids: string[]) => {
+                // Optimistic update
+                const previousImages = get().images;
+                set((state) => ({
+                    images: state.images.filter((img) => !ids.includes(img.id))
+                }));
+
+                try {
+                    await api.post('/portfolio/bulk-delete', { ids });
+                } catch (err) {
+                    console.error('Failed to delete images:', err);
+                    // Revert on failure
+                    set({ images: previousImages, error: 'Failed to delete images' });
                     throw err;
                 }
             },

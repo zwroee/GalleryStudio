@@ -1,30 +1,34 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, LogOut, Image as ImageIcon, Lock, Trash2, Upload, ExternalLink, Eye, Download, Heart, Settings } from 'lucide-react';
+import { Plus, LogOut, Image as ImageIcon, Lock, Trash2, Upload, ExternalLink, Eye, Download, Heart, Settings, CheckSquare, Square } from 'lucide-react';
 import { galleryApi, authApi } from '../services/api';
 import { useAuthStore } from '../store/authStore';
 import { usePortfolioStore } from '../store/portfolioStore';
 import type { Gallery } from '../types';
 import CreateGalleryModal from '../components/CreateGalleryModal';
+import PortfolioUploadModal from '../components/PortfolioUploadModal';
 
 export default function AdminDashboard() {
     const [galleries, setGalleries] = useState<Gallery[]>([]);
     const [loading, setLoading] = useState(true);
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showUploadModal, setShowUploadModal] = useState(false);
     const [activeTab, setActiveTab] = useState<'galleries' | 'portfolio' | 'settings'>('galleries');
+    const [selectedImages, setSelectedImages] = useState<Set<string>>(new Set());
 
     const user = useAuthStore((state) => state.user);
     const logout = useAuthStore((state) => state.logout);
 
     // Portfolio Store
-    // Portfolio Store
     const {
         images: portfolioImages,
         uploadImage,
         removeImage,
+        removeImages,
         updateProfile,
         businessName,
-        website
+        website,
+        fetchImages: fetchPortfolioImages
     } = usePortfolioStore();
 
     // Ref for file input
@@ -56,18 +60,42 @@ export default function AdminDashboard() {
         }
     };
 
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
+    const handlePortfolioUploadSuccess = () => {
+        setShowUploadModal(false);
+        fetchPortfolioImages();
+    };
+
+    const toggleImageSelection = (id: string) => {
+        setSelectedImages(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(id)) {
+                newSet.delete(id);
+            } else {
+                newSet.add(id);
+            }
+            return newSet;
+        });
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedImages.size === portfolioImages.length) {
+            setSelectedImages(new Set());
+        } else {
+            setSelectedImages(new Set(portfolioImages.map(img => img.id)));
+        }
+    };
+
+    const handleBulkDelete = async () => {
+        if (selectedImages.size === 0) return;
+
+        const confirmed = confirm(`Are you sure you want to delete ${selectedImages.size} image${selectedImages.size !== 1 ? 's' : ''}?`);
+        if (!confirmed) return;
 
         try {
-            await uploadImage(file);
+            await removeImages(Array.from(selectedImages));
+            setSelectedImages(new Set());
         } catch (err) {
-            alert('Failed to upload image');
-        } finally {
-            if (fileInputRef.current) {
-                fileInputRef.current.value = '';
-            }
+            alert('Failed to delete images');
         }
     };
 
@@ -248,26 +276,58 @@ export default function AdminDashboard() {
                     <div className="space-y-8">
                         <div>
                             <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-lg font-semibold text-gray-900">Portfolio Images</h3>
+                                <div className="flex items-center gap-4">
+                                    <h3 className="text-lg font-semibold text-gray-900">Portfolio Images</h3>
+                                    {portfolioImages.length > 0 && (
+                                        <>
+                                            <button
+                                                onClick={toggleSelectAll}
+                                                className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-2"
+                                            >
+                                                {selectedImages.size === portfolioImages.length ? (
+                                                    <CheckSquare className="w-4 h-4" />
+                                                ) : (
+                                                    <Square className="w-4 h-4" />
+                                                )}
+                                                {selectedImages.size === portfolioImages.length ? 'Deselect All' : 'Select All'}
+                                            </button>
+                                            {selectedImages.size > 0 && (
+                                                <button
+                                                    onClick={handleBulkDelete}
+                                                    className="btn-danger flex items-center gap-2 text-sm py-2 px-4"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                    Delete {selectedImages.size} Selected
+                                                </button>
+                                            )}
+                                        </>
+                                    )}
+                                </div>
                                 <button
-                                    onClick={handleAddPortfolioImage}
+                                    onClick={() => setShowUploadModal(true)}
                                     className="btn-primary flex items-center gap-2"
                                 >
                                     <Upload className="w-5 h-5" />
-                                    Add Image
+                                    Upload Images
                                 </button>
-                                <input
-                                    type="file"
-                                    ref={fileInputRef}
-                                    onChange={handleFileChange}
-                                    className="hidden"
-                                    accept="image/*"
-                                />
                             </div>
 
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                                 {portfolioImages.map((img) => (
                                     <div key={img.id} className="relative group aspect-square bg-gray-100 rounded-sm overflow-hidden">
+                                        {/* Selection Checkbox */}
+                                        <div className="absolute top-2 left-2 z-10">
+                                            <button
+                                                onClick={() => toggleImageSelection(img.id)}
+                                                className="bg-white rounded shadow-sm p-1 hover:bg-gray-50 transition-colors"
+                                            >
+                                                {selectedImages.has(img.id) ? (
+                                                    <CheckSquare className="w-5 h-5 text-blue-600" />
+                                                ) : (
+                                                    <Square className="w-5 h-5 text-gray-400" />
+                                                )}
+                                            </button>
+                                        </div>
                                         <img src={img.url} alt="" className="w-full h-full object-cover" />
                                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-4">
                                             <span className="text-white text-xs font-bold uppercase tracking-wider mb-2">{img.category}</span>
@@ -362,6 +422,16 @@ export default function AdminDashboard() {
                     <CreateGalleryModal
                         onClose={() => setShowCreateModal(false)}
                         onSuccess={handleGalleryCreated}
+                    />
+                )
+            }
+
+            {/* Portfolio Upload Modal */}
+            {
+                showUploadModal && (
+                    <PortfolioUploadModal
+                        onClose={() => setShowUploadModal(false)}
+                        onSuccess={handlePortfolioUploadSuccess}
                     />
                 )
             }
