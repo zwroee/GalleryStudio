@@ -364,7 +364,8 @@ export class ImageProcessingService {
      */
     static async processPortfolioImage(
         tempPath: string,
-        filename: string
+        filename: string,
+        watermarkPath?: string
     ): Promise<{ url: string; width: number; height: number }> {
         const portfolioDir = path.join('/storage', 'portfolio');
         await fs.mkdir(portfolioDir, { recursive: true });
@@ -376,12 +377,17 @@ export class ImageProcessingService {
         const outputPath = path.join(portfolioDir, uniqueName);
 
         // Process image (resize to reasonable max width, convert to jpeg)
-        const image = sharp(tempPath);
+        let image = sharp(tempPath);
         const metadata = await image.metadata();
 
         // Resize if too large
         if ((metadata.width || 0) > 2000) {
             image.resize(2000, null, { withoutEnlargement: true });
+        }
+
+        // Apply watermark if provided
+        if (watermarkPath) {
+            image = await this.applyWatermark(image, watermarkPath, 2000);
         }
 
         await image

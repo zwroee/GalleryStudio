@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { Instagram, Facebook, Mail, Phone, Globe, ArrowUp } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Instagram, Facebook, Mail, Phone, Globe, ArrowUp, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { usePortfolioStore } from '../store/portfolioStore';
 
@@ -8,6 +8,7 @@ export default function PortfolioPage() {
     const [activeCategory, setActiveCategory] = useState("ALL");
     const navigate = useNavigate();
     const [visibleImages, setVisibleImages] = useState<Set<number>>(new Set());
+    const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
     const imageRefs = useRef<(HTMLDivElement | null)[]>([]);
 
     useEffect(() => {
@@ -43,6 +44,35 @@ export default function PortfolioPage() {
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
+
+    // Lightbox handlers
+    const openLightbox = (index: number) => setLightboxIndex(index);
+    const closeLightbox = () => setLightboxIndex(null);
+
+    const nextImage = useCallback((e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        if (lightboxIndex === null) return;
+        setLightboxIndex((prev) => (prev === null || prev === filteredPhotos.length - 1 ? 0 : prev + 1));
+    }, [lightboxIndex, filteredPhotos.length]);
+
+    const prevImage = useCallback((e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        if (lightboxIndex === null) return;
+        setLightboxIndex((prev) => (prev === null || prev === 0 ? filteredPhotos.length - 1 : prev - 1));
+    }, [lightboxIndex, filteredPhotos.length]);
+
+    // Keyboard navigation for lightbox
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (lightboxIndex === null) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowRight') nextImage();
+            if (e.key === 'ArrowLeft') prevImage();
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [lightboxIndex, nextImage, prevImage]);
 
     // Real social media links
     const socialLinks = {
@@ -265,10 +295,67 @@ export default function PortfolioPage() {
                             </div>
 
                             {/* Hover Overlay */}
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 pointer-events-none" />
+                            <div
+                                className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 pointer-events-none"
+                                onClick={() => openLightbox(index)}
+                            />
+                            {/* Make the whole container clickable */}
+                            <button
+                                className="absolute inset-0 w-full h-full cursor-pointer bg-transparent border-none appearance-none focus:outline-none focus:ring-2 focus:ring-white/50"
+                                onClick={() => openLightbox(index)}
+                                aria-label={`View photo ${index + 1}`}
+                            />
                         </div>
                     ))}
                 </div>
+
+                {/* Lightbox Modal */}
+                {lightboxIndex !== null && (
+                    <div
+                        className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center backdrop-blur-sm"
+                        onClick={closeLightbox}
+                    >
+                        {/* Close button */}
+                        <button
+                            onClick={closeLightbox}
+                            className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors p-2 z-50"
+                        >
+                            <X className="w-8 h-8" />
+                        </button>
+
+                        {/* Navigation Buttons */}
+                        <button
+                            onClick={prevImage}
+                            className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors p-2 z-50 hidden md:block"
+                        >
+                            <ChevronLeft className="w-10 h-10" />
+                        </button>
+
+                        <button
+                            onClick={nextImage}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors p-2 z-50 hidden md:block"
+                        >
+                            <ChevronRight className="w-10 h-10" />
+                        </button>
+
+                        {/* Image */}
+                        <div
+                            className="relative max-w-[90vw] max-h-[90vh]"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <img
+                                src={filteredPhotos[lightboxIndex].url}
+                                alt="Portfolio lightbox"
+                                className="max-w-full max-h-[90vh] object-contain shadow-2xl"
+                            />
+                        </div>
+
+                        {/* Image Counter */}
+                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/70 font-light tracking-widest text-sm">
+                            {lightboxIndex + 1} / {filteredPhotos.length}
+                        </div>
+                    </div>
+                )}
 
                 {filteredPhotos.length === 0 && (
                     <div style={{

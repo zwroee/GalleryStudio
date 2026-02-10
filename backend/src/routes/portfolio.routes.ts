@@ -7,6 +7,7 @@ import fs from 'fs';
 import path from 'path';
 import util from 'util';
 import { pipeline } from 'stream';
+import { AuthService } from '../services/auth.service';
 
 const pump = util.promisify(pipeline);
 
@@ -37,8 +38,19 @@ export default async function portfolioRoutes(fastify: FastifyInstance) {
             await fs.promises.mkdir(path.dirname(tempPath), { recursive: true });
             await pump(data.file, fs.createWriteStream(tempPath));
 
+            // Get watermark path from admin user
+            const user = request.user as { id: string };
+            const adminUser = await AuthService.getUserById(user.id);
+            const watermarkPath = adminUser?.watermark_logo_path
+                ? path.join('/storage', adminUser.watermark_logo_path)
+                : undefined;
+
             // Process image
-            const processed = await ImageProcessingService.processPortfolioImage(tempPath, data.filename);
+            const processed = await ImageProcessingService.processPortfolioImage(
+                tempPath,
+                data.filename,
+                watermarkPath
+            );
 
             // Get category from fields
             const fields = data.fields as any;
@@ -90,13 +102,24 @@ export default async function portfolioRoutes(fastify: FastifyInstance) {
                 return reply.status(400).send({ error: 'No files uploaded' });
             }
 
+            // Get watermark path from admin user
+            const user = request.user as { id: string };
+            const adminUser = await AuthService.getUserById(user.id);
+            const watermarkPath = adminUser?.watermark_logo_path
+                ? path.join('/storage', adminUser.watermark_logo_path)
+                : undefined;
+
             const images = [];
 
             // Process each saved temp file
             for (const file of tempFiles) {
                 try {
                     // Process image
-                    const processed = await ImageProcessingService.processPortfolioImage(file.path, file.filename);
+                    const processed = await ImageProcessingService.processPortfolioImage(
+                        file.path,
+                        file.filename,
+                        watermarkPath
+                    );
 
                     // Save to DB
                     const image = await PortfolioService.addImage(
