@@ -2,10 +2,8 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { MultipartFile } from '@fastify/multipart';
 import path from 'path';
 import fs from 'fs/promises';
-import sharp from 'sharp';
 import pool from '../config/database';
 import { AuthService } from '../services/auth.service';
-import { ImageProcessingService } from '../services/image-processing.service';
 import { loginSchema, validateBody } from '../middleware/validation';
 import { LoginRequest } from '../types';
 
@@ -126,6 +124,9 @@ export default async function authRoutes(fastify: FastifyInstance) {
      */
     fastify.get('/debug-watermark', async (request: FastifyRequest, reply: FastifyReply) => {
         try {
+            // Lazy load sharp
+            const sharp = (await import('sharp')).default;
+
             // Public debug - Get ANY admin user to check their watermark
             const result = await pool.query('SELECT * FROM admin_users LIMIT 1');
             const user = result.rows[0];
@@ -191,6 +192,10 @@ export default async function authRoutes(fastify: FastifyInstance) {
      */
     fastify.get('/test-watermark', async (request: FastifyRequest, reply: FastifyReply) => {
         try {
+            // Lazy load dependencies
+            const sharp = (await import('sharp')).default;
+            const { ImageProcessingService } = await import('../services/image-processing.service');
+
             // Get ANY admin user to check their watermark
             const result = await pool.query('SELECT * FROM admin_users LIMIT 1');
             const user = result.rows[0];
@@ -213,7 +218,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
                 }
             });
 
-            // Apply watermark (using simplified import)
+            // Apply watermark
             image = await ImageProcessingService.applyWatermark(image, watermarkPath, width);
 
             // Return as JPEG
