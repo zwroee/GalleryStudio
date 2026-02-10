@@ -1,4 +1,9 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { MultipartFile } from '@fastify/multipart';
+import path from 'path';
+import fs from 'fs/promises';
+import sharp from 'sharp';
+import pool from '../config/database';
 import { AuthService } from '../services/auth.service';
 import { loginSchema, validateBody } from '../middleware/validation';
 import { LoginRequest } from '../types';
@@ -81,15 +86,26 @@ export default async function authRoutes(fastify: FastifyInstance) {
             }
 
             const buffer = await data.toBuffer();
-            const filename = `watermark-${Date.now()}${require('path').extname(data.filename)}`;
-            const uploadDir = require('path').join('/storage', 'uploads');
-            const filePath = require('path').join(uploadDir, filename);
+            const filename = `watermark-${Date.now()}${path.extname(data.filename)}`;
+            const uploadDir = path.join('/storage', 'uploads');
+            const filePath = path.join(uploadDir, filename);
 
             // Ensure directory exists
-            await require('fs').promises.mkdir(uploadDir, { recursive: true });
+            await fs.mkdir(uploadDir, { recursive: true });
+
+            // Delete old watermark if exists
+            const user = await AuthService.getUserById(payload.id);
+            if (user && user.watermark_logo_path) {
+                const oldPath = path.join('/storage', user.watermark_logo_path);
+                try {
+                    await fs.unlink(oldPath);
+                } catch (err) {
+                    request.log.warn(`Failed to delete old watermark: ${oldPath}`);
+                }
+            }
 
             // Save file
-            await require('fs').promises.writeFile(filePath, buffer);
+            await fs.writeFile(filePath, buffer);
 
             const relativePath = `uploads/${filename}`;
 
@@ -105,13 +121,12 @@ export default async function authRoutes(fastify: FastifyInstance) {
 
     /**
      * GET /api/auth/debug-watermark
-     * Debug watermark path and existence
+     * Debug watermark path and existence (Public for diagnosis)
      */
     fastify.get('/debug-watermark', async (request: FastifyRequest, reply: FastifyReply) => {
         try {
-            // Public debug for now - verify logic
-            // Get ANY admin user to check their watermark
-            const result = await require('../config/database').default.query('SELECT * FROM admin_users LIMIT 1');
+            // Public debug - Get ANY admin user to check their watermark
+            const result = await pool.query('SELECT * FROM admin_users LIMIT 1');
             const user = result.rows[0];
 
             if (!user) {
@@ -123,13 +138,13 @@ export default async function authRoutes(fastify: FastifyInstance) {
                 return { status: 'no_watermark_in_db' };
             }
 
-            const fullPath = require('path').join('/storage', dbPath);
+            const fullPath = path.join('/storage', dbPath);
             let fileExists = false;
             let fileStats = null;
             let sharpMetadata = null;
 
             try {
-                const stats = await require('fs').promises.stat(fullPath);
+                const stats = await fs.stat(fullPath);
                 fileExists = true;
                 fileStats = {
                     size: stats.size,
@@ -137,13 +152,12 @@ export default async function authRoutes(fastify: FastifyInstance) {
                     gid: stats.gid,
                     mode: stats.mode
                 };
-            } catch (e) {
+            } catch (e: any) {
                 fileExists = false;
             }
 
             if (fileExists) {
                 try {
-                    const sharp = require('sharp');
                     const meta = await sharp(fullPath).metadata();
                     sharpMetadata = {
                         format: meta.format,
@@ -165,6 +179,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
             };
 
         } catch (err) {
+            request.log.error(err);
             return { error: 'Debug failed', details: err };
         }
     });
