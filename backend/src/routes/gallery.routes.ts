@@ -235,7 +235,7 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
         }
 
         // Record usage
-        await EmailCollectionService.recordDownload(id, email);
+        await EmailCollectionService.recordGalleryAccess(id, email);
 
         // Import archiver
         const archiver = require('archiver');
