@@ -75,6 +75,14 @@ export class ImageProcessingService {
         }
 
         return outputPath;
+
+        try {
+            await fs.chmod(outputPath, 0o644);
+        } catch (err) {
+            console.warn(`Failed to chmod ${outputPath}:`, err);
+        }
+
+        return outputPath;
     }
 
     /**
@@ -105,6 +113,14 @@ export class ImageProcessingService {
         }
 
         await image.jpeg({ quality: config.imageQuality }).toFile(outputPath);
+
+        try {
+            await fs.chmod(outputPath, 0o644);
+        } catch (err) {
+            console.warn(`Failed to chmod ${outputPath}:`, err);
+        }
+
+        return outputPath;
 
         return outputPath;
     }
@@ -137,6 +153,14 @@ export class ImageProcessingService {
         }
 
         await image.jpeg({ quality: config.imageQuality }).toFile(outputPath);
+
+        try {
+            await fs.chmod(outputPath, 0o644);
+        } catch (err) {
+            console.warn(`Failed to chmod ${outputPath}:`, err);
+        }
+
+        return outputPath;
 
         return outputPath;
     }
