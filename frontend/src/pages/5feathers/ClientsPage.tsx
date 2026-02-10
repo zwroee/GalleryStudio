@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Navigation from '../../components/5feathers/Navigation';
 import Footer from '../../components/5feathers/Footer';
 import HeroSection from '../../components/5feathers/HeroSection';
-import { galleryApi } from '../../services/api';
+import { clientApi } from '../../services/api';
 import type { Gallery } from '../../types';
 
 export default function ClientsPage() {
@@ -15,12 +15,8 @@ export default function ClientsPage() {
         // Fetch public galleries from the backend
         const fetchGalleries = async () => {
             try {
-                const response = await galleryApi.getPublic();
-                // Filter to only show public galleries
-                // Note: The backend endpoint /galleries/public should already filter this, 
-                // but we filter here just in case or if using the general endpoint
-                const publicGalleries = response.galleries.filter(g => g.is_public !== false);
-                setGalleries(publicGalleries);
+                const response = await clientApi.getPublicGalleries();
+                setGalleries(response.galleries);
             } catch (error) {
                 console.error('Failed to fetch galleries:', error);
                 // If backend is not available, show empty state
@@ -34,7 +30,8 @@ export default function ClientsPage() {
     }, []);
 
     const handleGalleryClick = (galleryId: string) => {
-        navigate(`/gallery-studio/gallery/${galleryId}`);
+        // Navigate to the public client gallery view
+        navigate(`/gallery/${galleryId}`);
     };
 
     return (
