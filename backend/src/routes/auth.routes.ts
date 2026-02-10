@@ -188,13 +188,12 @@ export default async function authRoutes(fastify: FastifyInstance) {
 
     /**
      * GET /api/auth/test-watermark
-     * Generate a test image with the user's watermark applied
+     * Generate a test image with the user's watermark applied - DEBUG MODE
      */
     fastify.get('/test-watermark', async (request: FastifyRequest, reply: FastifyReply) => {
         try {
             // Lazy load dependencies
             const sharp = (await import('sharp')).default;
-            const { ImageProcessingService } = await import('../services/image-processing.service');
 
             // Get ANY admin user to check their watermark
             const result = await pool.query('SELECT * FROM admin_users LIMIT 1');
@@ -205,6 +204,13 @@ export default async function authRoutes(fastify: FastifyInstance) {
             }
 
             const watermarkPath = path.join('/storage', user.watermark_logo_path);
+
+            // Verify watermark file exists and is readable
+            try {
+                await fs.access(watermarkPath);
+            } catch (err) {
+                return reply.status(404).send({ error: 'Watermark file not found on disk', path: watermarkPath, details: err });
+            }
 
             // Create a grey background image
             const width = 1000;
@@ -218,16 +224,44 @@ export default async function authRoutes(fastify: FastifyInstance) {
                 }
             });
 
-            // Apply watermark
-            image = await ImageProcessingService.applyWatermark(image, watermarkPath, width);
+            // --- INLINED DEBUG LOGIC ---
+            try {
+                // 1. Load watermark
+                const wm = sharp(watermarkPath);
+                const wmMeta = await wm.metadata();
 
-            // Return as JPEG
-            const buffer = await image.jpeg().toBuffer();
-            reply.type('image/jpeg').send(buffer);
+                // 2. Resize watermark (mimic service logic)
+                const targetWidth = Math.floor(width * 0.3); // Make it big so we see it
+                const watermarkBuffer = await wm
+                    .resize(targetWidth, null, {
+                        fit: 'inside',
+                        withoutEnlargement: true
+                    })
+                    .toBuffer();
 
-        } catch (err) {
+                // 3. Composite
+                image = image.composite([{
+                    input: watermarkBuffer,
+                    gravity: 'center' // Put it right in the middle
+                }]);
+
+                // 4. Output
+                const buffer = await image.jpeg().toBuffer();
+                reply.type('image/jpeg').send(buffer);
+
+            } catch (compositeError: any) {
+                return reply.status(500).send({
+                    error: 'Composition Failed',
+                    message: compositeError.message,
+                    stack: compositeError.stack,
+                    watermarkPath,
+                    watermarkMeta: 'Failed to read metadata'
+                });
+            }
+
+        } catch (err: any) {
             request.log.error(err);
-            return reply.status(500).send({ error: 'Test failed', details: err });
+            return reply.status(500).send({ error: 'Test failed', details: err.message });
         }
     });
 }
