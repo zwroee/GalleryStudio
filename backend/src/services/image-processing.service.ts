@@ -37,7 +37,7 @@ export class ImageProcessingService {
 
         // Generate all image sizes
         const sizes: ImageSizes = {
-            thumbnail: await this.generateThumbnail(galleryId, originalPath, outputFilename),
+            thumbnail: await this.generateThumbnail(galleryId, originalPath, outputFilename, watermarkPath),
             preview: await this.generatePreview(galleryId, originalPath, outputFilename, watermarkPath),
             web: await this.generateWebSize(galleryId, originalPath, outputFilename, watermarkPath),
             original: await this.saveOriginal(galleryId, originalPath, outputFilename),
@@ -61,7 +61,8 @@ export class ImageProcessingService {
     private static async generateThumbnail(
         galleryId: string,
         sourcePath: string,
-        filename: string
+        filename: string,
+        watermarkPath?: string | null
     ): Promise<string> {
         const outputPath = path.join(
             config.storagePath,
@@ -70,13 +71,28 @@ export class ImageProcessingService {
             filename
         );
 
-        await sharp(sourcePath)
+        // First, resize the image to a buffer
+        const resizedBuffer = await sharp(sourcePath)
             .resize(config.thumbnailSize, config.thumbnailSize, {
                 fit: 'inside',
                 withoutEnlargement: true,
             })
-            .jpeg({ quality: config.imageQuality })
-            .toFile(outputPath);
+            .toBuffer();
+
+        // Now create a new sharp instance from the resized buffer
+        let image = sharp(resizedBuffer);
+
+        // Apply watermark if provided
+        console.log(`[GenerateThumbnail] Watermark check: ${watermarkPath ? 'YES' : 'NO'}`);
+        if (watermarkPath) {
+            console.log(`[GenerateThumbnail] APPLYING watermark`);
+            image = await this.applyWatermark(image, watermarkPath, config.thumbnailSize);
+            console.log(`[GenerateThumbnail] Watermark applied successfully`);
+        } else {
+            console.log(`[GenerateThumbnail] SKIPPING watermark - path is falsy`);
+        }
+
+        await image.jpeg({ quality: config.imageQuality }).toFile(outputPath);
 
         try {
             await fs.chmod(outputPath, 0o644);
