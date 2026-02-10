@@ -3,11 +3,10 @@ import { X, Download } from 'lucide-react';
 
 interface DownloadPinModalProps {
     galleryId: string;
-    galleryTitle: string;
     onClose: () => void;
 }
 
-export default function DownloadPinModal({ galleryId, galleryTitle, onClose }: DownloadPinModalProps) {
+export default function DownloadPinModal({ galleryId, onClose }: DownloadPinModalProps) {
     const [email, setEmail] = useState('');
     const [isDownloading, setIsDownloading] = useState(false);
     const [downloadProgress, setDownloadProgress] = useState(0);

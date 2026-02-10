@@ -327,7 +327,6 @@ export default function ClientGalleryView() {
             {showDownloadModal && gallery && (
                 <DownloadPinModal
                     galleryId={gallery.id}
-                    galleryTitle={gallery.title}
                     onClose={() => setShowDownloadModal(false)}
                 />
             )}
