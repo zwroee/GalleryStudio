@@ -184,13 +184,25 @@ export default function GallerySettingsModal({ onClose, onSave, gallery }: Galle
                                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                     </button>
                                 </div>
+                                {gallery.password_hash && !removePassword && (
+                                    <div className="mb-2 p-2 bg-green-50 border border-green-200 rounded-md flex items-center gap-2">
+                                        <Lock className="w-4 h-4 text-green-600" />
+                                        <span className="text-sm text-green-700 font-sans">Password is currently set</span>
+                                    </div>
+                                )}
                                 <input
                                     type={showPassword ? 'text' : 'password'}
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                     className="input-field font-sans"
                                     placeholder={gallery.password_hash ? 'Enter new password to change' : 'Leave empty for public gallery'}
+                                    disabled={removePassword}
                                 />
+                                <p className="text-xs text-neutral-500 mt-1 font-sans">
+                                    {gallery.password_hash
+                                        ? 'Enter a new password to update, or check the box below to remove protection'
+                                        : 'Set a password to require PIN entry for downloads'}
+                                </p>
                                 {gallery.password_hash && (
                                     <label className="flex items-center gap-2 mt-2 cursor-pointer">
                                         <input

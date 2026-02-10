@@ -217,19 +217,19 @@ export default function AdminDashboard() {
                                         className="card hover:shadow-md transition-shadow group overflow-hidden"
                                     >
                                         {/* Cover Image or Placeholder */}
-                                        {gallery.cover_image_path ? (
-                                            <div className="w-full h-48 bg-gray-100 mb-4 -mx-6 -mt-6 overflow-hidden">
+                                        <div className="w-full h-48 bg-gray-100 mb-4 rounded-t-lg overflow-hidden -mx-6 -mt-6">
+                                            {gallery.cover_image_path ? (
                                                 <img
                                                     src={`/storage/${gallery.cover_image_path}`}
                                                     alt={gallery.title}
                                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                                 />
-                                            </div>
-                                        ) : (
-                                            <div className="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 mb-4 -mx-6 -mt-6 flex items-center justify-center">
-                                                <ImageIcon className="w-16 h-16 text-gray-400" />
-                                            </div>
-                                        )}
+                                            ) : (
+                                                <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                                                    <ImageIcon className="w-16 h-16 text-gray-400" />
+                                                </div>
+                                            )}
+                                        </div>
 
                                         <div className="flex items-start justify-between mb-3">
                                             <h3 className="text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
@@ -409,6 +409,193 @@ export default function AdminDashboard() {
                                         className="hidden"
                                         accept="image/png"
                                     />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Storage Usage */}
+                        <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Storage Usage</h3>
+                            <div className="space-y-4">
+                                <div>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-sm font-medium text-gray-700">Galleries</span>
+                                        <span className="text-sm text-gray-600">{galleries.length} galleries</span>
+                                    </div>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-sm font-medium text-gray-700">Portfolio Images</span>
+                                        <span className="text-sm text-gray-600">{portfolioImages.length} images</span>
+                                    </div>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-sm font-medium text-gray-700">Total Photos</span>
+                                        <span className="text-sm text-gray-600">
+                                            {galleries.reduce((sum, g) => sum + (g.photo_count || 0), 0)} photos
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="pt-4 border-t border-gray-200">
+                                    <p className="text-xs text-gray-500">
+                                        Storage usage details are calculated based on your galleries and portfolio images.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Default Gallery Settings */}
+                        <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Default Gallery Settings</h3>
+                            <p className="text-sm text-gray-600 mb-4">
+                                These settings will be applied to all new galleries you create.
+                            </p>
+                            <div className="space-y-4">
+                                <label className="flex items-center gap-3 cursor-pointer group p-3 rounded-sm hover:bg-gray-50 transition-colors">
+                                    <input
+                                        type="checkbox"
+                                        defaultChecked={true}
+                                        className="w-4 h-4 text-primary-600 border-gray-300 rounded"
+                                    />
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2">
+                                            <Download className="w-4 h-4 text-gray-600" />
+                                            <span className="text-sm font-medium text-gray-900">Allow Downloads by Default</span>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            New galleries will allow clients to download watermarked images
+                                        </p>
+                                    </div>
+                                </label>
+
+                                <label className="flex items-center gap-3 cursor-pointer group p-3 rounded-sm hover:bg-gray-50 transition-colors">
+                                    <input
+                                        type="checkbox"
+                                        defaultChecked={true}
+                                        className="w-4 h-4 text-primary-600 border-gray-300 rounded"
+                                    />
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2">
+                                            <Heart className="w-4 h-4 text-gray-600" />
+                                            <span className="text-sm font-medium text-gray-900">Allow Favorites by Default</span>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            New galleries will allow clients to mark favorite photos
+                                        </p>
+                                    </div>
+                                </label>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Default Expiration Period
+                                    </label>
+                                    <select className="input-field">
+                                        <option value="never">Never expire</option>
+                                        <option value="30">30 days</option>
+                                        <option value="60">60 days</option>
+                                        <option value="90">90 days</option>
+                                        <option value="180">6 months</option>
+                                        <option value="365">1 year</option>
+                                    </select>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        Galleries will automatically hide from clients after this period
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Notification Preferences */}
+                        <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Notification Preferences</h3>
+                            <p className="text-sm text-gray-600 mb-4">
+                                Choose what email notifications you'd like to receive.
+                            </p>
+                            <div className="space-y-3">
+                                <label className="flex items-center gap-3 cursor-pointer group p-3 rounded-sm hover:bg-gray-50 transition-colors">
+                                    <input
+                                        type="checkbox"
+                                        defaultChecked={false}
+                                        className="w-4 h-4 text-primary-600 border-gray-300 rounded"
+                                    />
+                                    <div className="flex-1">
+                                        <span className="text-sm font-medium text-gray-900">New Favorites</span>
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            Get notified when clients mark photos as favorites
+                                        </p>
+                                    </div>
+                                </label>
+
+                                <label className="flex items-center gap-3 cursor-pointer group p-3 rounded-sm hover:bg-gray-50 transition-colors">
+                                    <input
+                                        type="checkbox"
+                                        defaultChecked={false}
+                                        className="w-4 h-4 text-primary-600 border-gray-300 rounded"
+                                    />
+                                    <div className="flex-1">
+                                        <span className="text-sm font-medium text-gray-900">Download Activity</span>
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            Get notified when clients download photos
+                                        </p>
+                                    </div>
+                                </label>
+
+                                <label className="flex items-center gap-3 cursor-pointer group p-3 rounded-sm hover:bg-gray-50 transition-colors">
+                                    <input
+                                        type="checkbox"
+                                        defaultChecked={true}
+                                        className="w-4 h-4 text-primary-600 border-gray-300 rounded"
+                                    />
+                                    <div className="flex-1">
+                                        <span className="text-sm font-medium text-gray-900">Weekly Summary</span>
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            Receive a weekly summary of gallery activity
+                                        </p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        {/* Security Settings */}
+                        <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Security Settings</h3>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Change Admin Password
+                                    </label>
+                                    <div className="space-y-3">
+                                        <input
+                                            type="password"
+                                            placeholder="Current password"
+                                            className="input-field"
+                                        />
+                                        <input
+                                            type="password"
+                                            placeholder="New password"
+                                            className="input-field"
+                                        />
+                                        <input
+                                            type="password"
+                                            placeholder="Confirm new password"
+                                            className="input-field"
+                                        />
+                                        <button className="btn-primary">
+                                            Update Password
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="pt-4 border-t border-gray-200">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Session Timeout
+                                    </label>
+                                    <select className="input-field">
+                                        <option value="30">30 minutes</option>
+                                        <option value="60">1 hour</option>
+                                        <option value="240">4 hours</option>
+                                        <option value="480">8 hours</option>
+                                        <option value="1440">24 hours</option>
+                                    </select>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        You'll be automatically logged out after this period of inactivity
+                                    </p>
                                 </div>
                             </div>
                         </div>

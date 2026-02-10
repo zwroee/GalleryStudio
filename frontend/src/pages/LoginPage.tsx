@@ -34,7 +34,7 @@ export default function LoginPage() {
             <div className="max-w-md w-full bg-white rounded-lg shadow-xl overflow-hidden">
                 <div className="px-8 py-12">
                     <div className="text-center mb-8">
-                        <h2 className="text-3xl font-serif font-bold text-gray-900 mb-2">Pixiset Studio</h2>
+                        <h2 className="text-3xl font-serif font-bold text-gray-900 mb-2">Gallery Studio</h2>
                         <p className="text-gray-600">Enter your credentials to manage your portfolio.</p>
                     </div>
 
