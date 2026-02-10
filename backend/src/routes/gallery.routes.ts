@@ -213,16 +213,16 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
     });
 
     /**
-     * POST /api/galleries/:id/download-all
+     * GET /api/galleries/:id/download-all
      * Download all photos in a gallery as ZIP (requires email)
      */
     interface DownloadAllRequest {
         Params: { id: string };
-        Body: { email: string };
+        Querystring: { email: string };
     }
-    fastify.post<DownloadAllRequest>('/:id/download-all', async (request, reply) => {
+    fastify.get<DownloadAllRequest>('/:id/download-all', async (request, reply) => {
         const { id } = request.params;
-        const { email } = request.body;
+        const { email } = request.query;
 
         if (!email || !email.includes('@')) {
             return reply.status(400).send({ error: 'Valid email required' });
@@ -234,8 +234,8 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
             return reply.status(404).send({ error: 'Gallery not found' });
         }
 
-        // Collect email
-        await EmailCollectionService.recordGalleryAccess(id, email);
+        // Record usage
+        await EmailCollectionService.recordDownload(id, email);
 
         // Import archiver
         const archiver = require('archiver');
@@ -249,17 +249,22 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
             zlib: { level: 9 } // Maximum compression
         });
 
-        // Pipe archive to response
+        archive.on('error', (err: any) => {
+            request.log.error(err);
+        });
+
         archive.pipe(reply.raw);
 
         // Add each photo to the archive
+        // Fix: Use correct storage path /storage
         for (const photo of gallery.photos) {
-            const photoPath = path.join(process.cwd(), 'storage', photo.file_path);
+            const photoPath = path.join('/storage', photo.file_path);
             try {
                 await fs.access(photoPath);
                 archive.file(photoPath, { name: photo.filename });
             } catch (err) {
-                request.log.warn(`Photo not found: ${photoPath}`);
+                // Try finding it at the old location just in case or log warning
+                request.log.warn(`Photo not found for zip: ${photoPath}`);
             }
         }
 
