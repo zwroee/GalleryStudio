@@ -5,6 +5,7 @@ import fs from 'fs/promises';
 import sharp from 'sharp';
 import pool from '../config/database';
 import { AuthService } from '../services/auth.service';
+import { ImageProcessingService } from '../services/image-processing.service';
 import { loginSchema, validateBody } from '../middleware/validation';
 import { LoginRequest } from '../types';
 
@@ -212,10 +213,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
                 }
             });
 
-            // Import ImageProcessingService dynamically to avoid circular deps if any
-            const { ImageProcessingService } = require('../services/image-processing.service');
-
-            // Apply watermark
+            // Apply watermark (using simplified import)
             image = await ImageProcessingService.applyWatermark(image, watermarkPath, width);
 
             // Return as JPEG
