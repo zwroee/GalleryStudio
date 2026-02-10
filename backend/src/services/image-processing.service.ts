@@ -74,8 +74,8 @@ export class ImageProcessingService {
         // First, resize the image to a buffer
         const resizedBuffer = await sharp(sourcePath)
             .resize(config.thumbnailSize, config.thumbnailSize, {
-                fit: 'inside',
-                withoutEnlargement: true,
+                fit: 'cover', // Fill the entire thumbnail, cropping if necessary
+                position: 'center', // Center the crop
             })
             .toBuffer();
 
