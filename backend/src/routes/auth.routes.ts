@@ -35,6 +35,15 @@ export default async function authRoutes(fastify: FastifyInstance) {
                     id: user.id,
                     username: user.username,
                     email: user.email,
+                    watermark_logo_path: user.watermark_logo_path,
+                    business_name: user.business_name,
+                    website: user.website,
+                    phone: user.phone,
+                    profile_picture_path: user.profile_picture_path,
+                    notification_new_favorites: user.notification_new_favorites,
+                    notification_download_activity: user.notification_download_activity,
+                    notification_weekly_summary: user.notification_weekly_summary,
+                    notification_email: user.notification_email,
                 },
             };
         } catch (err) {
@@ -68,6 +77,10 @@ export default async function authRoutes(fastify: FastifyInstance) {
                     website: user.website,
                     phone: user.phone,
                     profile_picture_path: user.profile_picture_path,
+                    notification_new_favorites: user.notification_new_favorites,
+                    notification_download_activity: user.notification_download_activity,
+                    notification_weekly_summary: user.notification_weekly_summary,
+                    notification_email: user.notification_email,
                 },
             };
         } catch (err) {
@@ -194,14 +207,12 @@ export default async function authRoutes(fastify: FastifyInstance) {
             return {
                 message: 'Profile updated successfully',
                 user: {
-                    id: user.id,
-                    username: user.username,
-                    email: user.email,
-                    watermark_logo_path: user.watermark_logo_path,
-                    business_name: user.business_name,
-                    website: user.website,
-                    phone: user.phone,
+                    // ... (fields)
                     profile_picture_path: user.profile_picture_path,
+                    notification_new_favorites: user.notification_new_favorites,
+                    notification_download_activity: user.notification_download_activity,
+                    notification_weekly_summary: user.notification_weekly_summary,
+                    notification_email: user.notification_email,
                 }
             };
         } catch (err) {
