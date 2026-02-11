@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import fs from 'fs/promises';
 import path from 'path';
+import { config } from '../config/env';
 
 async function listDir(dir: string): Promise<any[]> {
     try {
@@ -30,7 +31,7 @@ async function listDir(dir: string): Promise<any[]> {
 
 export default async function debugRoutes(fastify: FastifyInstance) {
     fastify.get('/fs', async (request, reply) => {
-        const root = '/storage';
+        const root = config.storagePath;
         const tree = await listDir(root);
         return {
             tree,

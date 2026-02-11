@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { MultipartFile } from '@fastify/multipart';
 import path from 'path';
 import fs from 'fs/promises';
+import { config } from '../config/env';
 import pool from '../config/database';
 import { AuthService } from '../services/auth.service';
 import { loginSchema, validateBody } from '../middleware/validation';
@@ -90,7 +91,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
 
             const buffer = await data.toBuffer();
             const filename = `watermark-${Date.now()}${path.extname(data.filename)}`;
-            const uploadDir = path.join('/storage', 'uploads');
+            const uploadDir = path.join(config.storagePath, 'uploads');
             const filePath = path.join(uploadDir, filename);
 
             // Ensure directory exists
@@ -99,7 +100,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
             // Delete old watermark if exists
             const user = await AuthService.getUserById(payload.id);
             if (user && user.watermark_logo_path) {
-                const oldPath = path.join('/storage', user.watermark_logo_path);
+                const oldPath = path.join(config.storagePath, user.watermark_logo_path);
                 try {
                     await fs.unlink(oldPath);
                 } catch (err) {
@@ -138,7 +139,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
 
             const buffer = await data.toBuffer();
             const filename = `profile-${Date.now()}${path.extname(data.filename)}`;
-            const uploadDir = path.join('/storage', 'uploads');
+            const uploadDir = path.join(config.storagePath, 'uploads');
             const filePath = path.join(uploadDir, filename);
 
             // Ensure directory exists
@@ -147,7 +148,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
             // Delete old profile picture if exists
             const user = await AuthService.getUserById(payload.id);
             if (user && user.profile_picture_path) {
-                const oldPath = path.join('/storage', user.profile_picture_path);
+                const oldPath = path.join(config.storagePath, user.profile_picture_path);
                 try {
                     await fs.unlink(oldPath);
                 } catch (err) {
@@ -231,7 +232,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
                 return { status: 'no_watermark_in_db' };
             }
 
-            const fullPath = path.join('/storage', dbPath);
+            const fullPath = path.join(config.storagePath, dbPath);
             let fileExists = false;
             let fileStats = null;
             let sharpMetadata = null;
@@ -294,7 +295,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
                 return reply.status(404).send({ error: 'No watermark found for admin' });
             }
 
-            const watermarkPath = path.join('/storage', user.watermark_logo_path);
+            const watermarkPath = path.join(config.storagePath, user.watermark_logo_path);
 
             // Verify watermark file exists and is readable
             try {

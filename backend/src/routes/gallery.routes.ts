@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { MultipartFile } from '@fastify/multipart';
 import path from 'path';
 import fs from 'fs/promises';
+import { config } from '../config/env';
 import { authenticate } from '../middleware/auth';
 import { createGallerySchema, updateGallerySchema, validateBody } from '../middleware/validation';
 import { GalleryService } from '../services/gallery.service';
@@ -138,7 +139,7 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
         }
 
         try {
-            const safeTempDir = path.join('/storage', 'temp');
+            const safeTempDir = path.join(config.storagePath, 'temp');
             await fs.mkdir(safeTempDir, { recursive: true });
 
             const files = await request.saveRequestFiles();
@@ -171,7 +172,7 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
 
                 // Fix: Prepend /storage to relative DB path so ImageProcessingService can find it
                 const watermarkPath = adminUser?.watermark_logo_path
-                    ? path.join('/storage', adminUser.watermark_logo_path)
+                    ? path.join(config.storagePath, adminUser.watermark_logo_path)
                     : undefined;
 
                 console.log(`[Upload] Final watermark path: ${watermarkPath}`);
@@ -275,7 +276,7 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
         // Add each photo to the archive
         // Fix: Use correct storage path /storage
         for (const photo of gallery.photos) {
-            const photoPath = path.join('/storage', photo.file_path);
+            const photoPath = path.join(config.storagePath, photo.file_path);
             try {
                 await fs.access(photoPath);
                 archive.file(photoPath, { name: photo.filename });
@@ -315,7 +316,7 @@ export default async function galleryRoutes(fastify: FastifyInstance) {
             const buffer = await data.toBuffer();
             const filename = `cover-${id}-${Date.now()}${path.extname(data.filename)}`;
             // Use absolute path matching Docker volume
-            const uploadDir = path.join('/storage', 'uploads');
+            const uploadDir = path.join(config.storagePath, 'uploads');
             const filePath = path.join(uploadDir, filename);
 
             // Ensure directory exists
@@ -365,7 +366,7 @@ async function processImageAsync(
             // Update with actual metadata from processing
             await updatePhotoMetadata(
                 photoId,
-                path.relative('/storage', processed.sizes.original).replace(/\\/g, '/'),
+                path.relative(config.storagePath, processed.sizes.original).replace(/\\/g, '/'),
                 processed.width,
                 processed.height,
                 processed.fileSize,

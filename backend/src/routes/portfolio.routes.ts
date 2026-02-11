@@ -7,6 +7,7 @@ import fs from 'fs';
 import path from 'path';
 import util from 'util';
 import { pipeline } from 'stream';
+import { config } from '../config/env';
 import { AuthService } from '../services/auth.service';
 
 const pump = util.promisify(pipeline);

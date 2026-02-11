@@ -367,7 +367,7 @@ export class ImageProcessingService {
         filename: string,
         watermarkPath?: string
     ): Promise<{ url: string; width: number; height: number }> {
-        const portfolioDir = path.join('/storage', 'portfolio');
+        const portfolioDir = path.join(config.storagePath, 'portfolio');
         await fs.mkdir(portfolioDir, { recursive: true });
 
         // Generate unique filename
