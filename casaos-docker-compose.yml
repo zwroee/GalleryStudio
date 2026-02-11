@@ -63,6 +63,8 @@ services:
     image: ghcr.io/zwroee/gallerystudio-frontend:latest
     container_name: gallery-studio-frontend
     hostname: gallery-studio-frontend
+    environment:
+      VITE_DEMO_MODE: ${DEMO_MODE:-false}
     networks:
       - gallery_studio_network
     restart: unless-stopped
@@ -70,6 +72,10 @@ services:
       title:
         en: Frontend UI
       icon: https://raw.githubusercontent.com/zwroee/GalleryStudio/dd5a00a8152d7b230f0545da1da6a4b6619040b4/logo.png
+      envs:
+        - container: VITE_DEMO_MODE
+          description:
+            en: Enable demo mode (true/false). Set to 'false' for production use.
 
   nginx:
     image: nginx:alpine
