@@ -5,17 +5,13 @@ x-casaos:
   author: Gallery Studio Team
   category: Media
   description:
-    en: A self-hosted photography gallery and portfolio platform.
+    en: A self-hosted photography gallery and portfolio platform. WARNING - This version does not persist data between restarts.
   tagline:
     en: Professional Photo Gallery Management
   developer: Gallery Studio
   title:
     en: Gallery Studio
   thumbnail: https://raw.githubusercontent.com/zwroee/GalleryStudio/dd5a00a8152d7b230f0545da1da6a4b6619040b4/logo.png
-  screenshot_link: []
-  tips:
-    before_install:
-      en: Ensure port 8080 is available.
   main: gallery-studio-nginx
 
 services:
@@ -28,8 +24,6 @@ services:
       POSTGRES_DB: gallery_studio
       POSTGRES_USER: gallery_studio
       POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
     networks:
       - gallery_studio_network
     restart: unless-stopped
@@ -47,8 +41,6 @@ services:
       JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-this}
       STORAGE_PATH: /storage
       NODE_ENV: production
-    volumes:
-      - gallery_storage:/storage
     depends_on:
       - postgres
     networks:
@@ -85,9 +77,6 @@ services:
             en: Web UI Port
     ports:
       - "8080:80"
-      - "8443:443"
-    volumes:
-      - gallery_storage:/storage:ro
     depends_on:
       - backend
       - frontend
@@ -99,34 +88,19 @@ services:
       server {
           listen 80;
           server_name _;
-
           location / {
               proxy_pass http://frontend:80;
-              proxy_set_header Host \$$host;
-              proxy_set_header X-Real-IP \$$remote_addr;
-              proxy_set_header X-Forwarded-For \$$proxy_add_x_forwarded_for;
-              proxy_set_header X-Forwarded-Proto \$$scheme;
+              proxy_set_header Host \$host;
+              proxy_set_header X-Real-IP \$remote_addr;
           }
-
           location /api {
               proxy_pass http://backend:3000;
-              proxy_set_header Host \$$host;
-              proxy_set_header X-Real-IP \$$remote_addr;
-              proxy_set_header X-Forwarded-For \$$proxy_add_x_forwarded_for;
-              proxy_set_header X-Forwarded-Proto \$$scheme;
-          }
-
-          location /storage {
-              alias /storage;
-              autoindex off;
+              proxy_set_header Host \$host;
+              proxy_set_header X-Real-IP \$remote_addr;
           }
       }
       EOF
       nginx -g 'daemon off;'"
-
-volumes:
-  postgres_data:
-  gallery_storage:
 
 networks:
   gallery_studio_network:
