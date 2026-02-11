@@ -304,7 +304,7 @@ export default function GalleryManagement() {
                                         </button>
                                     </div>
                                     <img
-                                        src={`/storage/galleries/${gallery.id}/thumbnail/${photo.filename}`}
+                                        src={`/storage/${gallery.id}/thumbnail/${photo.filename}`}
                                         alt={photo.filename}
                                         className="w-full h-full object-cover"
                                     />

@@ -67,12 +67,13 @@ export default function SlideshowViewer({ photos, startIndex, onClose }: Slidesh
             </div>
 
             {/* Main Image */}
-            <div className="flex-1 flex items-center justify-center p-12">
-                <div className="max-w-6xl max-h-full bg-gradient-to-br from-neutral-700 to-neutral-800 rounded-sm flex items-center justify-center aspect-video shadow-2xl">
-                    <div className="text-neutral-400 text-center">
-                        <p className="text-lg font-sans">Photo {currentIndex + 1}</p>
-                        <p className="text-sm opacity-75">{currentPhoto?.filename}</p>
-                    </div>
+            <div className="flex-1 flex items-center justify-center p-4 md:p-12 overflow-hidden">
+                <div className="relative max-w-full max-h-full flex items-center justify-center shadow-2xl">
+                    <img
+                        src={`/storage/${currentPhoto?.gallery_id}/preview/${currentPhoto?.filename}`}
+                        alt={currentPhoto?.filename}
+                        className="max-w-full max-h-[85vh] object-contain"
+                    />
                 </div>
             </div>
 

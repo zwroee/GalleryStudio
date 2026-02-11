@@ -63,7 +63,7 @@ export default function ClientGalleryView() {
         if (!id || !gallery?.allow_downloads) return;
 
         const link = document.createElement('a');
-        link.href = `/storage/galleries/${id}/web/${photo.filename}`;
+        link.href = `/storage/${id}/web/${photo.filename}`;
         link.download = photo.filename;
         link.click();
     };
@@ -154,7 +154,7 @@ export default function ClientGalleryView() {
                                 onClick={() => setSelectedPhoto(photo)}
                             >
                                 <img
-                                    src={`/storage/galleries/${id}/thumbnail/${photo.filename}`}
+                                    src={`/storage/${id}/thumbnail/${photo.filename}`}
                                     alt={photo.filename}
                                     className="w-full h-full object-cover transition-transform group-hover:scale-105"
                                 />
@@ -203,7 +203,7 @@ export default function ClientGalleryView() {
                     </button>
 
                     <img
-                        src={`/storage/galleries/${id}/preview/${selectedPhoto.filename}`}
+                        src={`/storage/${id}/preview/${selectedPhoto.filename}`}
                         alt={selectedPhoto.filename}
                         className="max-w-full max-h-full object-contain"
                     />
