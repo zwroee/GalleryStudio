@@ -1,21 +1,22 @@
 x-casaos:
-  name:
-    en: Gallery Studio
-  icon: https://raw.githubusercontent.com/zwroee/GalleryStudio/dd5a00a8152d7b230f0545da1da6a4b6619040b4/logo.png
-  author: Gallery Studio Team
-  category: Media
-  description:
-    en: A self-hosted photography gallery and portfolio platform. WARNING - This version does not persist data between restarts.
-  tagline:
-    en: Professional Photo Gallery Management
-  developer: Gallery Studio
-  title:
-    en: Gallery Studio
-  thumbnail: https://raw.githubusercontent.com/zwroee/GalleryStudio/dd5a00a8152d7b230f0545da1da6a4b6619040b4/logo.png
+  architectures:
+    - amd64
+    - arm64
   main: gallery-studio-nginx
+  description:
+    en_us: A self-hosted photography gallery and portfolio platform for photographers.
+  tagline:
+    en_us: Professional Photo Gallery Management
+  developer: Gallery Studio
+  author: Gallery Studio Team
+  icon: https://raw.githubusercontent.com/zwroee/GalleryStudio/dd5a00a8152d7b230f0545da1da6a4b6619040b4/logo.png
+  thumbnail: https://raw.githubusercontent.com/zwroee/GalleryStudio/dd5a00a8152d7b230f0545da1da6a4b6619040b4/logo.png
+  title:
+    en_us: Gallery Studio
+  category: Media
+  port_map: "8080"
 
 services:
-
   postgres:
     image: postgres:16-alpine
     container_name: gallery-studio-db
@@ -24,13 +25,13 @@ services:
       POSTGRES_DB: gallery_studio
       POSTGRES_USER: gallery_studio
       POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+    volumes:
+      - type: volume
+        source: postgres_data
+        target: /var/lib/postgresql/data
     networks:
       - gallery_studio_network
     restart: unless-stopped
-    x-casaos:
-      title:
-        en: Database
-      icon: https://raw.githubusercontent.com/zwroee/GalleryStudio/dd5a00a8152d7b230f0545da1da6a4b6619040b4/logo.png
 
   backend:
     image: ghcr.io/zwroee/gallerystudio-backend:latest
@@ -41,15 +42,15 @@ services:
       JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-this}
       STORAGE_PATH: /storage
       NODE_ENV: production
+    volumes:
+      - type: volume
+        source: gallery_storage
+        target: /storage
     depends_on:
       - postgres
     networks:
       - gallery_studio_network
     restart: unless-stopped
-    x-casaos:
-      title:
-        en: Backend API
-      icon: https://raw.githubusercontent.com/zwroee/GalleryStudio/dd5a00a8152d7b230f0545da1da6a4b6619040b4/logo.png
 
   frontend:
     image: ghcr.io/zwroee/gallerystudio-frontend:latest
@@ -58,25 +59,20 @@ services:
     networks:
       - gallery_studio_network
     restart: unless-stopped
-    x-casaos:
-      title:
-        en: Frontend UI
-      icon: https://raw.githubusercontent.com/zwroee/GalleryStudio/dd5a00a8152d7b230f0545da1da6a4b6619040b4/logo.png
 
   nginx:
     image: nginx:alpine
     container_name: gallery-studio-nginx
     hostname: gallery-studio-nginx
-    x-casaos:
-      title:
-        en: Gallery Studio
-      icon: https://raw.githubusercontent.com/zwroee/GalleryStudio/dd5a00a8152d7b230f0545da1da6a4b6619040b4/logo.png
-      ports:
-        - container: "80"
-          description:
-            en: Web UI Port
     ports:
-      - "8080:80"
+      - target: 80
+        published: ${WEBUI_PORT:-8080}
+        protocol: tcp
+    volumes:
+      - type: volume
+        source: gallery_storage
+        target: /storage
+        read_only: true
     depends_on:
       - backend
       - frontend
@@ -98,9 +94,18 @@ services:
               proxy_set_header Host \$host;
               proxy_set_header X-Real-IP \$remote_addr;
           }
+          location /storage {
+              alias /storage;
+          }
       }
       EOF
       nginx -g 'daemon off;'"
+
+volumes:
+  postgres_data:
+    driver: local
+  gallery_storage:
+    driver: local
 
 networks:
   gallery_studio_network:
