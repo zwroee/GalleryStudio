@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { X, Upload, Image as ImageIcon, User, Mail, Key, Save } from 'lucide-react';
+import { X, Upload, Image as ImageIcon, User, Mail, Key, Save, Bell } from 'lucide-react';
+import { authApi } from '../services/api';
+import { useAuthStore } from '../store/authStore';
 
 interface MainSettingsModalProps {
     onClose: () => void;
@@ -7,20 +9,28 @@ interface MainSettingsModalProps {
         username: string;
         email: string;
         watermark_logo_path: string | null;
+        notification_new_favorites?: boolean;
+        notification_download_activity?: boolean;
+        notification_weekly_summary?: boolean;
     };
 }
 
 export default function MainSettingsModal({ onClose, currentUser }: MainSettingsModalProps) {
-    const [activeTab, setActiveTab] = useState<'profile' | 'watermark'>('profile');
+    const { user, login } = useAuthStore();
+    const [activeTab, setActiveTab] = useState<'profile' | 'watermark' | 'notifications'>('profile');
     const [profileData, setProfileData] = useState({
         username: currentUser.username,
         email: currentUser.email,
         currentPassword: '',
         newPassword: '',
         confirmPassword: '',
+        notification_new_favorites: currentUser.notification_new_favorites || false,
+        notification_download_activity: currentUser.notification_download_activity || false,
+        notification_weekly_summary: currentUser.notification_weekly_summary || false,
     });
     const [watermarkFile, setWatermarkFile] = useState<File | null>(null);
     const [watermarkPreview, setWatermarkPreview] = useState<string | null>(currentUser.watermark_logo_path);
+    const [saving, setSaving] = useState(false);
 
     const handleWatermarkSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -34,8 +44,45 @@ export default function MainSettingsModal({ onClose, currentUser }: MainSettings
         }
     };
 
-    const handleSaveProfile = () => {
-        alert('Profile updated! (Demo mode)');
+    const handleSaveProfile = async () => {
+        try {
+            setSaving(true);
+            const data: any = {
+                username: profileData.username,
+                email: profileData.email,
+            };
+
+            if (profileData.newPassword) {
+                if (profileData.newPassword !== profileData.confirmPassword) {
+                    alert('Passwords do not match');
+                    return;
+                }
+                data.password = profileData.newPassword;
+                data.currentPassword = profileData.currentPassword;
+            }
+
+            // Include notification preferences
+            data.notification_new_favorites = profileData.notification_new_favorites;
+            data.notification_download_activity = profileData.notification_download_activity;
+            data.notification_weekly_summary = profileData.notification_weekly_summary;
+
+            const updatedUser = await authApi.updateProfile(data);
+
+            // Update local store
+            if (user) {
+                // Keep token, update user data
+                const token = localStorage.getItem('auth_token') || '';
+                login(updatedUser, token);
+            }
+
+            alert('Settings saved successfully');
+            onClose();
+        } catch (error) {
+            console.error('Failed to update profile:', error);
+            alert('Failed to update profile');
+        } finally {
+            setSaving(false);
+        }
     };
 
     const handleSaveWatermark = () => {
@@ -59,18 +106,28 @@ export default function MainSettingsModal({ onClose, currentUser }: MainSettings
                         <button
                             onClick={() => setActiveTab('profile')}
                             className={`py-4 px-2 font-sans text-sm font-medium border-b-2 transition-colors ${activeTab === 'profile'
-                                    ? 'border-neutral-900 text-neutral-900'
-                                    : 'border-transparent text-neutral-500 hover:text-neutral-700'
+                                ? 'border-neutral-900 text-neutral-900'
+                                : 'border-transparent text-neutral-500 hover:text-neutral-700'
                                 }`}
                         >
                             <User className="w-4 h-4 inline mr-2" />
                             Profile
                         </button>
                         <button
+                            onClick={() => setActiveTab('notifications')}
+                            className={`py-4 px-2 font-sans text-sm font-medium border-b-2 transition-colors ${activeTab === 'notifications'
+                                ? 'border-neutral-900 text-neutral-900'
+                                : 'border-transparent text-neutral-500 hover:text-neutral-700'
+                                }`}
+                        >
+                            <Bell className="w-4 h-4 inline mr-2" />
+                            Notifications
+                        </button>
+                        <button
                             onClick={() => setActiveTab('watermark')}
                             className={`py-4 px-2 font-sans text-sm font-medium border-b-2 transition-colors ${activeTab === 'watermark'
-                                    ? 'border-neutral-900 text-neutral-900'
-                                    : 'border-transparent text-neutral-500 hover:text-neutral-700'
+                                ? 'border-neutral-900 text-neutral-900'
+                                : 'border-transparent text-neutral-500 hover:text-neutral-700'
                                 }`}
                         >
                             <ImageIcon className="w-4 h-4 inline mr-2" />
@@ -154,9 +211,79 @@ export default function MainSettingsModal({ onClose, currentUser }: MainSettings
                                 </div>
                             </div>
 
-                            <button onClick={handleSaveProfile} className="btn-primary w-full flex items-center justify-center gap-2">
+                            <button
+                                onClick={handleSaveProfile}
+                                disabled={saving}
+                                className="btn-primary w-full flex items-center justify-center gap-2"
+                            >
                                 <Save className="w-5 h-5" />
-                                Save Profile
+                                {saving ? 'Saving...' : 'Save Profile'}
+                            </button>
+                        </div>
+                    ) : activeTab === 'notifications' ? (
+                        <div className="space-y-8 max-w-xl">
+                            <div>
+                                <h3 className="text-lg font-serif font-medium text-neutral-900 mb-1">Notification Preferences</h3>
+                                <p className="text-sm text-neutral-500 font-sans mb-6">Choose what email notifications you'd like to receive.</p>
+
+                                <div className="space-y-6">
+                                    <div className="flex items-start gap-3">
+                                        <div className="flex items-center h-5">
+                                            <input
+                                                id="new-favorites"
+                                                type="checkbox"
+                                                checked={profileData.notification_new_favorites}
+                                                onChange={(e) => setProfileData({ ...profileData, notification_new_favorites: e.target.checked })}
+                                                className="w-4 h-4 text-neutral-900 border-neutral-300 rounded focus:ring-neutral-900"
+                                            />
+                                        </div>
+                                        <div className="text-sm">
+                                            <label htmlFor="new-favorites" className="font-medium text-neutral-900">New Favorites</label>
+                                            <p className="text-neutral-500">Get notified when clients mark photos as favorites</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-start gap-3">
+                                        <div className="flex items-center h-5">
+                                            <input
+                                                id="download-activity"
+                                                type="checkbox"
+                                                checked={profileData.notification_download_activity}
+                                                onChange={(e) => setProfileData({ ...profileData, notification_download_activity: e.target.checked })}
+                                                className="w-4 h-4 text-neutral-900 border-neutral-300 rounded focus:ring-neutral-900"
+                                            />
+                                        </div>
+                                        <div className="text-sm">
+                                            <label htmlFor="download-activity" className="font-medium text-neutral-900">Download Activity</label>
+                                            <p className="text-neutral-500">Get notified when clients download photos</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-start gap-3">
+                                        <div className="flex items-center h-5">
+                                            <input
+                                                id="weekly-summary"
+                                                type="checkbox"
+                                                checked={profileData.notification_weekly_summary}
+                                                onChange={(e) => setProfileData({ ...profileData, notification_weekly_summary: e.target.checked })}
+                                                className="w-4 h-4 text-neutral-900 border-neutral-300 rounded focus:ring-neutral-900"
+                                            />
+                                        </div>
+                                        <div className="text-sm">
+                                            <label htmlFor="weekly-summary" className="font-medium text-neutral-900">Weekly Summary</label>
+                                            <p className="text-neutral-500">Receive a weekly summary of gallery activity</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={handleSaveProfile}
+                                disabled={saving}
+                                className="btn-primary w-full flex items-center justify-center gap-2"
+                            >
+                                <Save className="w-5 h-5" />
+                                {saving ? 'Saving...' : 'Save Preferences'}
                             </button>
                         </div>
                     ) : (

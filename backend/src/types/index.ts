@@ -49,6 +49,9 @@ export interface AdminUser {
     website?: string;
     phone?: string;
     profile_picture_path?: string | null;
+    notification_new_favorites?: boolean;
+    notification_download_activity?: boolean;
+    notification_weekly_summary?: boolean;
     created_at: Date;
 }
 

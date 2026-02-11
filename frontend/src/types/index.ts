@@ -49,6 +49,9 @@ export interface AdminUser {
     email: string;
     watermark_logo_path: string | null;
     created_at?: string;
+    notification_new_favorites?: boolean;
+    notification_download_activity?: boolean;
+    notification_weekly_summary?: boolean;
 }
 
 // API Request/Response Types

@@ -121,6 +121,9 @@ export class AuthService {
         website?: string;
         phone?: string;
         profile_picture_path?: string;
+        notification_new_favorites?: boolean;
+        notification_download_activity?: boolean;
+        notification_weekly_summary?: boolean;
     }): Promise<AdminUser | null> {
         const updates: string[] = [];
         const values: any[] = [];
@@ -141,6 +144,18 @@ export class AuthService {
         if (data.profile_picture_path !== undefined) {
             updates.push(`profile_picture_path = $${paramIndex++}`);
             values.push(data.profile_picture_path);
+        }
+        if (data.notification_new_favorites !== undefined) {
+            updates.push(`notification_new_favorites = $${paramIndex++}`);
+            values.push(data.notification_new_favorites);
+        }
+        if (data.notification_download_activity !== undefined) {
+            updates.push(`notification_download_activity = $${paramIndex++}`);
+            values.push(data.notification_download_activity);
+        }
+        if (data.notification_weekly_summary !== undefined) {
+            updates.push(`notification_weekly_summary = $${paramIndex++}`);
+            values.push(data.notification_weekly_summary);
         }
 
         if (updates.length === 0) return null;
