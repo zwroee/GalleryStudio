@@ -1,0 +1,93 @@
+x-casaos:
+  name:
+    en: Gallery Studio
+  icon: https://raw.githubusercontent.com/zwroee/GalleryStudio/main/frontend/public/logo.png
+  author: Gallery Studio Team
+  category: Media
+  description:
+    en: A self-hosted photography gallery and portfolio platform.
+  tagline:
+    en: Professional Photo Gallery Management
+  developer: Gallery Studio
+  title:
+    en: Gallery Studio
+  thumbnail: https://raw.githubusercontent.com/zwroee/GalleryStudio/main/frontend/public/logo.png
+  screenshot_link: []
+  tips:
+    before_install:
+      en: Ensure port 8080 is available.
+  main: gallery-studio-nginx
+
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: gallery-studio-db
+    environment:
+      POSTGRES_DB: gallery_studio
+      POSTGRES_USER: gallery_studio
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - gallery_studio_network
+    restart: unless-stopped
+
+  backend:
+    image: ghcr.io/zwroee/gallerystudio-backend:latest
+    container_name: gallery-studio-backend
+    environment:
+      DATABASE_URL: postgresql://gallery_studio:${DB_PASSWORD:-changeme}@postgres:5432/gallery_studio
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-this}
+      STORAGE_PATH: /storage
+      NODE_ENV: production
+    volumes:
+      - /DATA/GalleryStudio/storage:/storage
+    depends_on:
+      - postgres
+    networks:
+      - gallery_studio_network
+    restart: unless-stopped
+
+  frontend:
+    image: ghcr.io/zwroee/gallerystudio-frontend:latest
+    container_name: gallery-studio-frontend
+    networks:
+      - gallery_studio_network
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: gallery-studio-nginx
+    x-casaos:
+      envs: []
+      ports:
+        - container: "80"
+          description:
+            en: Web UI Port
+      volumes:
+        - container: /etc/nginx/nginx.conf
+          description:
+            en: Nginx Configuration
+        - container: /storage
+          description:
+            en: Storage Directory
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - /DATA/GalleryStudio/storage:/storage:ro
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - gallery_studio_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  gallery_studio_network:
+    driver: bridge

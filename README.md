@@ -112,11 +112,13 @@ docker compose exec backend npm run create-admin
 
 ## CasaOS Installation
 
-The easiest way to install Gallery Studio on CasaOS is using the "Custom Install" feature with our Docker Compose file.
+The easiest way to install Gallery Studio on CasaOS is using the "Custom Install" feature.
 
-1. **Prepare the Files**:
-   - Download the `docker-compose.yml` file from this repository.
-   - Or clone the repository to your CasaOS server.
+**Important**: Since CasaOS runs on a remote server, it cannot build the code from source. You must use the "Release" version which uses pre-built Docker images.
+
+1. **Prepare the File**:
+   - Download the `casaos-docker-compose.yml` file from this repository.
+   - (Alternatively, copy its content).
 
 2. **Open CasaOS Dashboard**:
    - Click the **+** button in the top left or "App Store".
@@ -124,16 +126,15 @@ The easiest way to install Gallery Studio on CasaOS is using the "Custom Install
 
 3. **Import Configuration**:
    - Click the **Import** icon (top right of the overlay).
-   - Select "Docker Compose" and upload or paste the contents of `docker-compose.yml`.
-   - CasaOS will automatically parse the services (`backend`, `frontend`, `nginx`, `postgres`).
+   - Select "Docker Compose" and upload `casaos-docker-compose.yml`.
 
 4. **Verify Settings**:
+   - CasaOS will now correctly see the `ghcr.io/zwroee/gallerystudio-backend` and `frontend` images.
    - Ensure the "Main App" is set to the **nginx** service.
-   - Check that port **8080** is not in use (or change it to an available port).
-   - You can modify the environment variables (like passwords) in the "Environment" tab for each service before installing.
+   - Check that port **8080** is not in use.
 
 5. **Install**:
-   - Click **Install** and wait for the containers to start.
+   - Click **Install**.
 
 6. **Post-Install Setup**:
    - Open the app terminal (click the terminal icon on the app card).
