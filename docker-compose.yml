@@ -1,22 +1,49 @@
 x-casaos:
-  name:
-    en: Gallery Studio
-  icon: https://raw.githubusercontent.com/zwroee/GalleryStudio/refs/heads/main/logo.png
-  author: Gallery Studio Team
+  architectures:
+    - amd64
+    - arm64
+  main: gallery-studio-nginx
   category: Media
-  description:
-    en: A self-hosted photography gallery and portfolio platform.
-  tagline:
-    en: Professional Photo Gallery Management
   developer: Gallery Studio
-  title:
-    en: Gallery Studio
+  author: Gallery Studio Team
+  icon: https://raw.githubusercontent.com/zwroee/GalleryStudio/refs/heads/main/logo.png
   thumbnail: https://raw.githubusercontent.com/zwroee/GalleryStudio/refs/heads/main/logo.png
+  title:
+    en_us: Gallery Studio
+  tagline:
+    en_us: Professional self-hosted photography gallery and portfolio platform for photographers.
+  description:
+    en_us: |
+      Gallery Studio is a modern, self-hosted photography gallery and portfolio platform designed for professional photographers.
+
+      - **Client Galleries** – Create beautiful, PIN-protected galleries for client photo delivery
+      - **Portfolio Management** – Showcase your best work with customizable portfolio galleries
+      - **Watermark Protection** – Automatically apply watermarks to protect your images
+      - **Admin Dashboard** – Manage galleries, upload photos, and control access from one place
+      - **Modern UI** – Clean, responsive design that looks great on all devices
+      - **Self-Hosted** – Full control over your data and images
+
+      **Learn More:**
+      - [Gallery Studio GitHub](https://github.com/zwroee/GalleryStudio)
+      - [Documentation](https://github.com/zwroee/GalleryStudio#readme)
   screenshot_link: []
   tips:
     before_install:
-      en: Ensure port 8080 is available.
-  main: gallery-studio-nginx
+      en_us: |
+        ### Getting Started
+
+        1. After installation, access Gallery Studio at `http://your-server-ip:8080`
+        2. Create your admin account on first visit
+        3. Log in to the admin dashboard
+        4. Start creating galleries and uploading photos
+
+        **Default Settings:**
+        - Web UI Port: 8080
+        - Database: PostgreSQL (auto-configured)
+        - Storage: Docker volume (persistent)
+
+        **Security Note:** Change the default JWT_SECRET and DB_PASSWORD in the environment variables for production use.
+  port_map: "8080"
 
 services:
 
