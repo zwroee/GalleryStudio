@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Instagram, Facebook, Mail, Phone, Globe, ArrowUp, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Instagram, Facebook, Mail, Phone, Globe, ArrowUp, X, ChevronLeft, ChevronRight, Github } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { usePortfolioStore } from '../store/portfolioStore';
 
@@ -80,347 +80,251 @@ export default function PortfolioPage() {
         facebook: '',
         tiktok: '',
         youtube: '',
-        website: website || ''
+        website: website || '',
+        github: 'https://github.com/zwroee/GalleryStudio'
     };
 
     return (
-        <div className="ffp-page" style={{ background: 'var(--ffp-white)' }}>
+        <div className="min-h-screen bg-neutral-50 text-neutral-900 font-sans selection:bg-neutral-900 selection:text-white">
+
+            {/* GitHub Corner Link */}
+            <a
+                href={socialLinks.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="fixed top-0 right-0 z-50 p-4 text-neutral-400 hover:text-neutral-900 transition-colors duration-300"
+                aria-label="View on GitHub"
+            >
+                <Github className="w-6 h-6" />
+            </a>
+
             {/* Navigation */}
-            <nav className="ffp-nav">
-                <div className="ffp-nav-container">
-                    <div className="ffp-nav-left">
+            <nav className="w-full py-6 px-4 md:px-8 bg-neutral-50/80 backdrop-blur-sm sticky top-0 z-40 border-b border-neutral-100">
+                <div className="max-w-7xl mx-auto flex justify-between items-center">
+                    <div className="w-1/3 md:w-1/4">
+                        {/* Placeholder for left nav items if needed */}
                     </div>
 
-                    <div className="ffp-nav-center">
-                        <div className="ffp-brand">
+                    <div className="w-1/3 md:w-1/2 flex justify-center">
+                        <Link to="/" className="text-xl md:text-2xl font-serif tracking-widest uppercase hover:opacity-70 transition-opacity">
                             {businessName}
-                        </div>
+                        </Link>
                     </div>
 
-                    <div className="ffp-nav-right">
+                    <div className="w-1/3 md:w-1/4 flex justify-end gap-6 text-xs tracking-widest font-medium">
+                        {/* Right nav items */}
+                        <Link to="/gallery-studio" className="hover:text-neutral-500 transition-colors">LOGIN</Link>
                     </div>
                 </div>
             </nav>
 
             {/* Header Section */}
-            <header style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                paddingTop: '140px',
-                paddingBottom: '3rem',
-                paddingLeft: '1rem',
-                paddingRight: '1rem',
-                textAlign: 'center'
-            }}>
-                {/* Logo Placeholder */}
-                <div style={{
-                    width: '300px',
-                    height: '300px',
-                    borderRadius: '50%',
-                    background: 'var(--ffp-secondary)',
-                    border: '2px solid var(--ffp-accent)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: '2rem',
-                    overflow: 'hidden'
-                }}>
-                    {usePortfolioStore.getState().profilePictureUrl ? (
-                        <img
-                            src={usePortfolioStore.getState().profilePictureUrl!}
-                            alt={businessName}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        />
-                    ) : (
-                        <span style={{
-                            fontFamily: 'var(--ffp-font-serif)',
-                            fontSize: '6rem',
-                            fontStyle: 'italic',
-                            color: 'var(--ffp-accent)'
-                        }}>
-                            {businessName.split(' ').map(w => w[0]).join('').slice(0, 2)}
-                        </span>
-                    )}
+            <header className="flex flex-col items-center justify-center pt-20 pb-16 px-4 text-center">
+                {/* Logo */}
+                <div className="w-48 h-48 md:w-64 md:h-64 rounded-full border-2 border-neutral-200 p-2 mb-8 transition-transform hover:scale-105 duration-700 ease-out">
+                    <div className="w-full h-full rounded-full overflow-hidden bg-white shadow-sm flex items-center justify-center">
+                        {usePortfolioStore.getState().profilePictureUrl ? (
+                            <img
+                                src={usePortfolioStore.getState().profilePictureUrl!}
+                                alt={businessName}
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <div className="flex flex-col items-center justify-center h-full bg-neutral-100 text-neutral-400">
+                                <span className="font-serif text-6xl italic text-neutral-300">
+                                    {businessName.split(' ').map(w => w[0]).join('').slice(0, 2)}
+                                </span>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
-                <h1 style={{
-                    fontFamily: 'var(--ffp-font-serif)',
-                    fontSize: '3rem',
-                    letterSpacing: '0.3em',
-                    fontWeight: 600,
-                    marginBottom: '2rem',
-                    textTransform: 'uppercase',
-                    color: 'var(--ffp-text)'
-                }}>
+                <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl tracking-widest font-light mb-8 text-neutral-800 uppercase">
                     {businessName}
                 </h1>
 
-                <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '0.75rem',
-                    fontSize: '0.9rem',
-                    fontWeight: 300,
-                    color: 'var(--ffp-text-light)'
-                }}>
-                    <a href={socialLinks.website} target="_blank" rel="noreferrer" style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        color: 'var(--ffp-text-light)',
-                        textDecoration: 'none',
-                        transition: 'color 0.3s ease'
-                    }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = 'var(--ffp-accent)'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = 'var(--ffp-text-light)'}
-                    >
-                        <Globe className="w-4 h-4" />
-                        5fp.photo
-                    </a>
-                    {phone && (
-                        <a href={`tel:${phone}`} style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                            color: 'var(--ffp-text-light)',
-                            textDecoration: 'none',
-                            transition: 'color 0.3s ease'
-                        }}
-                            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--ffp-accent)'}
-                            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--ffp-text-light)'}
-                        >
-                            <Phone className="w-4 h-4" />
-                            {phone}
+                <div className="flex flex-wrap justify-center gap-6 md:gap-8 text-sm md:text-base font-light text-neutral-500 tracking-wide">
+                    {socialLinks.website && (
+                        <a href={socialLinks.website} target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-neutral-900 transition-colors group">
+                            <Globe className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                            <span>Website</span>
                         </a>
                     )}
-                    <a href={`mailto:${email}`} style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        color: 'var(--ffp-text-light)',
-                        textDecoration: 'none',
-                        transition: 'color 0.3s ease'
-                    }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = 'var(--ffp-accent)'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = 'var(--ffp-text-light)'}
-                    >
-                        <Mail className="w-4 h-4" />
-                        {email}
-                    </a>
+                    {phone && (
+                        <a href={`tel:${phone}`} className="flex items-center gap-2 hover:text-neutral-900 transition-colors group">
+                            <Phone className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                            <span>{phone}</span>
+                        </a>
+                    )}
+                    {email && (
+                        <a href={`mailto:${email}`} className="flex items-center gap-2 hover:text-neutral-900 transition-colors group">
+                            <Mail className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                            <span>Contact</span>
+                        </a>
+                    )}
                 </div>
             </header>
 
             {/* Navigation Categories */}
-            <nav style={{
-                maxWidth: '1400px',
-                margin: '0 auto',
-                padding: '0 1rem',
-                marginBottom: '4rem'
-            }}>
-                <div style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    justifyContent: 'center',
-                    gap: '1.5rem 2rem',
-                    fontSize: '0.75rem',
-                    fontWeight: 500,
-                    letterSpacing: '0.15em',
-                    color: 'var(--ffp-text-light)',
-                    textTransform: 'uppercase'
-                }}>
+            <div className="max-w-7xl mx-auto px-4 mb-12 md:mb-16">
+                <div className="flex flex-wrap justify-center gap-y-4 gap-x-8 md:gap-x-12">
                     {categories.map((cat) => (
                         <button
                             key={cat}
                             onClick={() => setActiveCategory(cat)}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                color: activeCategory === cat ? 'var(--ffp-text)' : 'var(--ffp-text-light)',
-                                textDecoration: activeCategory === cat ? 'underline' : 'none',
-                                textDecorationColor: 'var(--ffp-text)',
-                                textUnderlineOffset: '4px',
-                                textDecorationThickness: '1px',
-                                transition: 'color 0.3s ease',
-                                fontSize: '0.75rem',
-                                fontWeight: 500,
-                                letterSpacing: '0.15em',
-                                textTransform: 'uppercase'
-                            }}
-                            onMouseEnter={(e) => {
-                                if (activeCategory !== cat) {
-                                    e.currentTarget.style.color = 'var(--ffp-text)';
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                if (activeCategory !== cat) {
-                                    e.currentTarget.style.color = 'var(--ffp-text-light)';
-                                }
-                            }}
+                            className={`
+                                text-xs md:text-sm font-medium tracking-[0.2em] uppercase transition-all duration-300 pb-1 border-b
+                                ${activeCategory === cat
+                                    ? 'text-neutral-900 border-neutral-900'
+                                    : 'text-neutral-400 border-transparent hover:text-neutral-600 hover:border-neutral-200'}
+                            `}
                         >
                             {cat}
                         </button>
                     ))}
                 </div>
-            </nav>
+            </div>
 
             {/* Masonry Grid */}
-            <main style={{
-                maxWidth: '1600px',
-                margin: '0 auto',
-                padding: '0 1rem 5rem'
-            }}>
+            <main className="max-w-[1800px] mx-auto px-4 pb-20">
                 <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
                     {filteredPhotos.map((photo, index) => (
                         <div
                             key={photo.id}
                             ref={(el) => (imageRefs.current[index] = el)}
                             data-index={index}
-                            className="break-inside-avoid relative group cursor-pointer"
+                            className={`
+                                break-inside-avoid relative group cursor-pointer overflow-hidden
+                                transition-all duration-700 ease-out fill-mode-forwards
+                            `}
                             onClick={() => openLightbox(index)}
                             style={{
                                 opacity: visibleImages.has(index) ? 1 : 0,
-                                transform: visibleImages.has(index) ? 'translateY(0)' : 'translateY(30px)',
-                                transition: 'opacity 0.6s ease-out, transform 0.6s ease-out',
-                                transitionDelay: `${(index % 4) * 0.1}s`
+                                transform: visibleImages.has(index) ? 'translateY(0)' : 'translateY(40px)',
                             }}
                         >
-                            <div
-                                className="bg-neutral-100 w-full overflow-hidden"
-                                style={{ height: `${photo.height}px` }}
-                            >
+                            <div className="bg-neutral-200 w-full overflow-hidden">
                                 <img
                                     src={photo.url}
-                                    alt="Portfolio Item"
-                                    className="w-full h-full object-cover transition-all duration-500 ease-in-out"
-                                    style={{
-                                        filter: 'brightness(1)',
-                                    }}
+                                    alt="Portfolio"
+                                    className="w-full h-auto object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
+                                    loading="lazy"
                                 />
                             </div>
 
                             {/* Hover Overlay */}
-                            <div
-                                className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 pointer-events-none"
-                            />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-500 pointer-events-none" />
                         </div>
                     ))}
                 </div>
 
-                {/* Lightbox Modal */}
-                {lightboxIndex !== null && (
-                    <div
-                        className="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center backdrop-blur-sm"
-                        onClick={closeLightbox}
-                    >
-                        {/* Close button */}
-                        <button
-                            onClick={closeLightbox}
-                            className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors p-2 z-50"
-                        >
-                            <X className="w-8 h-8" />
-                        </button>
-
-                        {/* Navigation Buttons */}
-                        <button
-                            onClick={prevImage}
-                            className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors p-2 z-50 hidden md:block"
-                        >
-                            <ChevronLeft className="w-10 h-10" />
-                        </button>
-
-                        <button
-                            onClick={nextImage}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors p-2 z-50 hidden md:block"
-                        >
-                            <ChevronRight className="w-10 h-10" />
-                        </button>
-
-                        {/* Image */}
-                        <div
-                            className="relative max-w-[90vw] max-h-[90vh]"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <img
-                                src={filteredPhotos[lightboxIndex].url}
-                                alt="Portfolio lightbox"
-                                className="max-w-full max-h-[90vh] object-contain shadow-2xl"
-                            />
-                        </div>
-
-                        {/* Image Counter */}
-                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/70 font-light tracking-widest text-sm">
-                            {lightboxIndex + 1} / {filteredPhotos.length}
-                        </div>
-                    </div>
-                )}
-
                 {filteredPhotos.length === 0 && (
-                    <div style={{
-                        textAlign: 'center',
-                        padding: '5rem 0',
-                        color: 'var(--ffp-text-light)',
-                        fontWeight: 300
-                    }}>
+                    <div className="text-center py-20 text-neutral-400 font-light tracking-wide">
                         No photos found in this category.
                     </div>
                 )}
             </main>
 
-            {/* Footer */}
-            <footer className="ffp-footer">
-                {/* Instagram Section */}
-                <div className="ffp-footer-instagram">
-                    <Instagram className="instagram-icon" />
-                    <h3>Instagram</h3>
-                    <a
-                        href={socialLinks.instagram}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="instagram-handle"
+            {/* Lightbox Modal */}
+            {lightboxIndex !== null && (
+                <div
+                    className="fixed inset-0 z-[100] bg-white/95 backdrop-blur-md flex items-center justify-center animate-in fade-in duration-300"
+                    onClick={closeLightbox}
+                >
+                    <button
+                        onClick={closeLightbox}
+                        className="absolute top-6 right-6 text-neutral-500 hover:text-neutral-900 transition-colors p-2 z-50 transform hover:scale-110 duration-200"
+                        aria-label="Close"
                     >
-                        @GalleryStudio
-                    </a>
-                </div>
+                        <X className="w-8 h-8 md:w-10 md:h-10" />
+                    </button>
 
-                {/* Footer Navigation */}
-                <div className="ffp-footer-nav">
-                    <div className="ffp-footer-nav-column">
-                        <Link to="/gallery-studio/portfolio">PORTFOLIO</Link>
+                    <button
+                        onClick={prevImage}
+                        className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-900 transition-colors p-4 z-50 hidden md:block"
+                        aria-label="Previous image"
+                    >
+                        <ChevronLeft className="w-12 h-12" />
+                    </button>
+
+                    <button
+                        onClick={nextImage}
+                        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-900 transition-colors p-4 z-50 hidden md:block"
+                        aria-label="Next image"
+                    >
+                        <ChevronRight className="w-12 h-12" />
+                    </button>
+
+                    {/* Image Container */}
+                    <div
+                        className="relative w-full h-full p-4 md:p-12 flex items-center justify-center outline-none"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <img
+                            src={filteredPhotos[lightboxIndex].url}
+                            alt="Lightbox view"
+                            className="max-w-full max-h-full object-contain shadow-2xl animate-in zoom-in-95 duration-300"
+                        />
+
+                        {/* Caption/Counter */}
+                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur px-4 py-2 rounded-full text-xs font-medium tracking-widest text-neutral-600">
+                            {lightboxIndex + 1} / {filteredPhotos.length}
+                        </div>
                     </div>
-                    <div className="ffp-footer-nav-column">
-                        <Link to="/gallery-studio">LOGIN</Link>
-                    </div>
                 </div>
+            )}
 
-                {/* Back to Top Button */}
-                <button onClick={scrollToTop} className="ffp-back-to-top" aria-label="Back to top">
-                    <ArrowUp />
-                </button>
+            {/* Footer */}
+            <footer className="bg-white border-t border-neutral-100 pt-16 pb-8 px-4 text-center">
+                <div className="max-w-4xl mx-auto flex flex-col items-center">
 
-                {/* Copyright and Social */}
-                <div className="ffp-footer-bottom">
-                    <p className="copyright">All content Copyright © 2026 {businessName}</p>
-
-                    <div className="ffp-social-icons">
-                        <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook"><Facebook /></a>
-                        <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram"><Instagram /></a>
-                        <a href={socialLinks.tiktok} target="_blank" rel="noopener noreferrer" aria-label="TikTok">
-                            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
-                            </svg>
+                    {/* Instagram Feature */}
+                    <div className="mb-12 flex flex-col items-center">
+                        <Instagram className="w-6 h-6 mb-4 text-neutral-800" />
+                        <h3 className="font-serif text-lg mb-2">Instagram</h3>
+                        <a
+                            href={socialLinks.instagram}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-neutral-500 hover:text-neutral-900 transition-colors tracking-widest text-sm"
+                        >
+                            @GalleryStudio
                         </a>
-                        <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" aria-label="YouTube">
-                            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                            </svg>
-                        </a>
+                    </div>
+
+                    {/* Footer Nav */}
+                    <div className="flex flex-col md:flex-row gap-8 md:gap-16 mb-12 text-xs font-medium tracking-[0.2em] text-neutral-400">
+                        <Link to="/gallery-studio/portfolio" className="hover:text-neutral-900 transition-colors">PORTFOLIO</Link>
+                        <a href={socialLinks.github} target="_blank" rel="noopener noreferrer" className="hover:text-neutral-900 transition-colors">GITHUB</a>
+                        <Link to="/gallery-studio" className="hover:text-neutral-900 transition-colors">LOGIN</Link>
+                    </div>
+
+                    {/* Back to Top */}
+                    <button
+                        onClick={scrollToTop}
+                        className="mb-12 p-3 rounded-full border border-neutral-200 text-neutral-400 hover:text-neutral-900 hover:border-neutral-900 transition-all duration-300 hover:-translate-y-1"
+                        aria-label="Back to top"
+                    >
+                        <ArrowUp className="w-5 h-5" />
+                    </button>
+
+                    <div className="w-full border-t border-neutral-100 my-8"></div>
+
+                    {/* Bottom */}
+                    <div className="flex flex-col md:flex-row justify-between items-center w-full max-w-7xl animate-in fade-in slide-in-from-bottom-4 duration-700">
+                        <p className="text-xs text-neutral-400 tracking-wide mb-4 md:mb-0">
+                            © {new Date().getFullYear()} {businessName}. All rights reserved.
+                        </p>
+
+                        <div className="flex gap-6 text-neutral-400">
+                            <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="hover:text-neutral-900 transition-colors"><Facebook className="w-4 h-4" /></a>
+                            <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="hover:text-neutral-900 transition-colors"><Instagram className="w-4 h-4" /></a>
+                        </div>
                     </div>
                 </div>
             </footer>
         </div>
     );
 }
+
+// Ensure the Tailwind build picks this up by running the build command after this.
