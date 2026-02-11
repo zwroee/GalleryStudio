@@ -29,4 +29,13 @@ export const config = {
     webSize: parseInt(process.env.WEB_SIZE || '2048', 10),
     imageQuality: parseInt(process.env.IMAGE_QUALITY || '85', 10),
     frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
+    smtp: {
+        host: process.env.SMTP_HOST,
+        port: parseInt(process.env.SMTP_PORT || '587', 10),
+        secure: process.env.SMTP_SECURE === 'true',
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+        fromName: process.env.SMTP_FROM_NAME || 'Gallery Studio',
+        fromEmail: process.env.SMTP_FROM_EMAIL || 'noreply@gallerystudio.com',
+    },
 } as const;

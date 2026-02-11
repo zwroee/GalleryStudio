@@ -61,6 +61,10 @@ export const authApi = {
     },
 
 
+    sendTestEmail: async (email?: string): Promise<{ success: boolean; message: string }> => {
+        const { data } = await api.post('/auth/test-email', { email });
+        return data;
+    },
 };
 
 // Admin Gallery API

@@ -5,6 +5,7 @@ import fs from 'fs/promises';
 import { config } from '../config/env';
 import pool from '../config/database';
 import { AuthService } from '../services/auth.service';
+import { mailService } from '../services/mail.service';
 import { loginSchema, validateBody } from '../middleware/validation';
 import { LoginRequest } from '../types';
 
@@ -218,6 +219,36 @@ export default async function authRoutes(fastify: FastifyInstance) {
         } catch (err) {
             request.log.error(err);
             return reply.status(500).send({ error: 'Update failed' });
+        }
+    });
+
+    /**
+     * POST /api/auth/test-email
+     * Send a test email to verify SMTP settings
+     */
+    fastify.post('/test-email', async (request: FastifyRequest, reply: FastifyReply) => {
+        try {
+            await request.jwtVerify();
+            const user = request.user as { id: string, email?: string };
+
+            // Allow user to specify a target email, or default to their account email
+            const body = request.body as { email?: string };
+            const targetEmail = body.email || user.email;
+
+            if (!targetEmail) {
+                return reply.status(400).send({ error: 'No email address provided' });
+            }
+
+            const success = await mailService.sendTestEmail(targetEmail);
+
+            if (success) {
+                return { success: true, message: `Test email sent to ${targetEmail}` };
+            } else {
+                return reply.status(500).send({ error: 'Failed to send test email. Check server logs.' });
+            }
+        } catch (err) {
+            request.log.error(err);
+            return reply.status(500).send({ error: 'Test email failed' });
         }
     });
 

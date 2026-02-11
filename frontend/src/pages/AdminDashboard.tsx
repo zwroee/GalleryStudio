@@ -829,7 +829,27 @@ export default function AdminDashboard() {
                                     </p>
                                 </div>
                             </div>
-                            <div className="flex justify-end mt-6">
+                            <div className="flex justify-between items-center mt-6 gap-4">
+                                <button
+                                    onClick={async () => {
+                                        try {
+                                            const targetEmail = notification_email || user?.email;
+                                            if (!targetEmail) {
+                                                alert('Please provide an email address');
+                                                return;
+                                            }
+                                            const result = await authApi.sendTestEmail(targetEmail);
+                                            alert(result.message || 'Test email sent!');
+                                        } catch (err) {
+                                            console.error('Test email failed:', err);
+                                            alert('Failed to send test email. Check console for details.');
+                                        }
+                                    }}
+                                    className="btn-secondary flex items-center gap-2"
+                                >
+                                    <Mail className="w-4 h-4" />
+                                    Send Test Email
+                                </button>
                                 <button
                                     onClick={handleSaveProfile}
                                     className="btn-primary"

@@ -22,6 +22,7 @@
     "dotenv": "^16.4.1",
     "fastify": "^4.26.0",
     "node-pg-migrate": "^7.0.2",
+    "nodemailer": "^8.0.1",
     "pg": "^8.11.3",
     "sharp": "^0.33.2",
     "zod": "^3.22.4"
@@ -29,6 +30,7 @@
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/node": "^20.11.16",
+    "@types/nodemailer": "^7.0.9",
     "@types/pg": "^8.11.0",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3"
