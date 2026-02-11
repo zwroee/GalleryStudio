@@ -59,16 +59,7 @@ export const authApi = {
         return data;
     },
 
-    updateProfile: async (updates: Partial<LoginResponse['user']> & {
-        currentPassword?: string;
-        password?: string;
-        notification_new_favorites?: boolean;
-        notification_download_activity?: boolean;
-        notification_weekly_summary?: boolean;
-    }): Promise<LoginResponse['user']> => {
-        const { data } = await api.patch<LoginResponse['user']>('/auth/profile', updates);
-        return data;
-    },
+
 };
 
 // Admin Gallery API
