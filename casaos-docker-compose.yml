@@ -1,34 +1,15 @@
-x-casaos:
-  architectures:
-    - amd64
-    - arm64
-  main: gallery-studio-nginx
-  description:
-    en_us: A self-hosted photography gallery and portfolio platform for photographers.
-  tagline:
-    en_us: Professional Photo Gallery Management
-  developer: Gallery Studio
-  author: Gallery Studio Team
-  icon: https://raw.githubusercontent.com/zwroee/GalleryStudio/dd5a00a8152d7b230f0545da1da6a4b6619040b4/logo.png
-  thumbnail: https://raw.githubusercontent.com/zwroee/GalleryStudio/dd5a00a8152d7b230f0545da1da6a4b6619040b4/logo.png
-  title:
-    en_us: Gallery Studio
-  category: Media
-  port_map: "8080"
+name: gallery-studio
 
 services:
   postgres:
     image: postgres:16-alpine
     container_name: gallery-studio-db
-    hostname: gallery-studio-db
     environment:
       POSTGRES_DB: gallery_studio
       POSTGRES_USER: gallery_studio
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+      POSTGRES_PASSWORD: changeme
     volumes:
-      - type: volume
-        source: postgres_data
-        target: /var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - gallery_studio_network
     restart: unless-stopped
@@ -36,16 +17,13 @@ services:
   backend:
     image: ghcr.io/zwroee/gallerystudio-backend:latest
     container_name: gallery-studio-backend
-    hostname: gallery-studio-backend
     environment:
-      DATABASE_URL: postgresql://gallery_studio:${DB_PASSWORD:-changeme}@postgres:5432/gallery_studio
-      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-this}
+      DATABASE_URL: postgresql://gallery_studio:changeme@postgres:5432/gallery_studio
+      JWT_SECRET: your-super-secret-jwt-key-change-this
       STORAGE_PATH: /storage
       NODE_ENV: production
     volumes:
-      - type: volume
-        source: gallery_storage
-        target: /storage
+      - gallery_storage:/storage
     depends_on:
       - postgres
     networks:
@@ -55,7 +33,6 @@ services:
   frontend:
     image: ghcr.io/zwroee/gallerystudio-frontend:latest
     container_name: gallery-studio-frontend
-    hostname: gallery-studio-frontend
     networks:
       - gallery_studio_network
     restart: unless-stopped
@@ -63,16 +40,10 @@ services:
   nginx:
     image: nginx:alpine
     container_name: gallery-studio-nginx
-    hostname: gallery-studio-nginx
     ports:
-      - target: 80
-        published: ${WEBUI_PORT:-8080}
-        protocol: tcp
+      - "8080:80"
     volumes:
-      - type: volume
-        source: gallery_storage
-        target: /storage
-        read_only: true
+      - gallery_storage:/storage:ro
     depends_on:
       - backend
       - frontend
@@ -103,10 +74,7 @@ services:
 
 volumes:
   postgres_data:
-    driver: local
   gallery_storage:
-    driver: local
 
 networks:
   gallery_studio_network:
-    driver: bridge
