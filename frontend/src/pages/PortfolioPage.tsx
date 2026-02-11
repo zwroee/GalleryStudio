@@ -89,8 +89,6 @@ export default function PortfolioPage() {
             <nav className="ffp-nav">
                 <div className="ffp-nav-container">
                     <div className="ffp-nav-left">
-                        <a href="#portfolio" style={{ color: 'var(--ffp-white)' }}>PORTFOLIO</a>
-                        <a href="#about" style={{ color: 'var(--ffp-white)' }}>ABOUT</a>
                     </div>
 
                     <div className="ffp-nav-center">
@@ -100,8 +98,6 @@ export default function PortfolioPage() {
                     </div>
 
                     <div className="ffp-nav-right">
-                        <a href="#contact" style={{ color: 'var(--ffp-white)' }}>CONTACT</a>
-                        <a href={socialLinks.website} target="_blank" rel="noreferrer" style={{ color: 'var(--ffp-white)' }}>WEBSITE</a>
                     </div>
                 </div>
             </nav>
