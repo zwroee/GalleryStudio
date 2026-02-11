@@ -19,7 +19,7 @@ services:
     environment:
       DATABASE_URL: postgresql://pixiset:${DB_PASSWORD:-changeme}@postgres:5432/pixiset
       JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-this}
-      STORAGE_PATH: /storage/galleries
+      STORAGE_PATH: /storage
       NODE_ENV: production
     volumes:
       - ./storage:/storage
