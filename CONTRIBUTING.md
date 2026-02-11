@@ -85,6 +85,25 @@ Looking for something to work on? Here are some areas where we need help:
 -   [ ] **Themes**: Implement a theming system for client galleries.
 -   [ ] **Documentation**: Improve API documentation and setup guides.
 
+3. GitHub Actions will automatically build and publish Docker images with version tags
+4. Create a GitHub Release with changelog
+
+## Submitting to CasaOS App Store
+
+To submit Gallery Studio to the official CasaOS App Store:
+
+1. **Ensure images are built**: Check that the v1.0.0 images are available on GHCR
+2. **Test the installation**: Verify the app works correctly
+3. **Fork the App Store repo**: https://github.com/IceWhaleTech/CasaOS-AppStore
+4. **Copy submission files**:
+   ```bash
+   # In your fork, create the app directory
+   mkdir -p Apps/GalleryStudio
+   cp casaos-appstore/* Apps/GalleryStudio/
+   ```
+5. **Submit Pull Request**: Create a PR to the main CasaOS-AppStore repository
+6. **Wait for review**: The CasaOS team will review and merge if approved
+
 ## Reporting Issues
 
 If you find a bug or have a feature request, please open an issue on GitHub. include as much detail as possible to help us reproduce and understand the problem.
