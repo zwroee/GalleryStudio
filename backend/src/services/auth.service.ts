@@ -61,6 +61,16 @@ export class AuthService {
     }
 
     /**
+     * Get first admin user (for public profile)
+     */
+    static async getFirstAdminUser(): Promise<AdminUser | null> {
+        const result = await pool.query<AdminUser>(
+            'SELECT * FROM admin_users ORDER BY created_at ASC LIMIT 1'
+        );
+        return result.rows[0] || null;
+    }
+
+    /**
      * Verify gallery password
      */
     static async verifyGalleryPassword(
@@ -101,5 +111,49 @@ export class AuthService {
             'UPDATE admin_users SET watermark_logo_path = $1 WHERE id = $2',
             [watermarkPath, userId]
         );
+    }
+
+    /**
+     * Update admin profile
+     */
+    static async updateProfile(userId: string, data: {
+        business_name?: string;
+        website?: string;
+        phone?: string;
+        profile_picture_path?: string;
+    }): Promise<AdminUser | null> {
+        const updates: string[] = [];
+        const values: any[] = [];
+        let paramIndex = 1;
+
+        if (data.business_name !== undefined) {
+            updates.push(`business_name = $${paramIndex++}`);
+            values.push(data.business_name);
+        }
+        if (data.website !== undefined) {
+            updates.push(`website = $${paramIndex++}`);
+            values.push(data.website);
+        }
+        if (data.phone !== undefined) {
+            updates.push(`phone = $${paramIndex++}`);
+            values.push(data.phone);
+        }
+        if (data.profile_picture_path !== undefined) {
+            updates.push(`profile_picture_path = $${paramIndex++}`);
+            values.push(data.profile_picture_path);
+        }
+
+        if (updates.length === 0) return null;
+
+        values.push(userId);
+        const query = `
+            UPDATE admin_users 
+            SET ${updates.join(', ')} 
+            WHERE id = $${paramIndex}
+            RETURNING *
+        `;
+
+        const result = await pool.query<AdminUser>(query, values);
+        return result.rows[0];
     }
 }

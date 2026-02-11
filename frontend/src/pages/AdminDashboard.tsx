@@ -29,11 +29,17 @@ export default function AdminDashboard() {
         updateProfile,
         businessName,
         website,
+        phone,
+        profilePictureUrl,
+        saveProfile,
+        uploadProfilePicture,
         fetchImages: fetchPortfolioImages
     } = usePortfolioStore();
 
     // Ref for file input
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const profilePicInputRef = useRef<HTMLInputElement>(null);
+    const watermarkInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         loadGalleries();
@@ -156,7 +162,6 @@ export default function AdminDashboard() {
     };
 
     // Watermark Upload
-    const watermarkInputRef = useRef<HTMLInputElement>(null);
     const handleWatermarkUploadClick = () => {
         if (watermarkInputRef.current) {
             watermarkInputRef.current.click();
@@ -177,6 +182,36 @@ export default function AdminDashboard() {
             if (watermarkInputRef.current) {
                 watermarkInputRef.current.value = '';
             }
+        }
+    };
+
+    const handleProfilePicClick = () => {
+        if (profilePicInputRef.current) {
+            profilePicInputRef.current.click();
+        }
+    };
+
+    const handleProfilePicChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        try {
+            await uploadProfilePicture(file);
+        } catch (err) {
+            alert('Failed to upload profile picture');
+        } finally {
+            if (profilePicInputRef.current) {
+                profilePicInputRef.current.value = '';
+            }
+        }
+    };
+
+    const handleSaveProfile = async () => {
+        try {
+            await saveProfile();
+            alert('Profile saved successfully');
+        } catch (err) {
+            alert('Failed to save profile');
         }
     };
 
@@ -649,7 +684,47 @@ export default function AdminDashboard() {
                     <div className="space-y-8">
                         <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
                             <h3 className="text-lg font-semibold text-gray-900 mb-4">Business Profile</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                            {/* Profile Picture */}
+                            <div className="mb-6 flex items-center gap-6">
+                                <div className="relative group w-24 h-24 rounded-full overflow-hidden bg-gray-100 border border-gray-200">
+                                    {profilePictureUrl ? (
+                                        <img
+                                            src={profilePictureUrl}
+                                            alt="Profile"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                            <ImageIcon className="w-8 h-8" />
+                                        </div>
+                                    )}
+                                    <div
+                                        onClick={handleProfilePicClick}
+                                        className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                                    >
+                                        <Upload className="w-6 h-6 text-white" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <button
+                                        onClick={handleProfilePicClick}
+                                        className="btn-secondary text-sm mb-2"
+                                    >
+                                        Change Profile Picture
+                                    </button>
+                                    <p className="text-xs text-gray-500">Recommended: Square JPG or PNG, at least 400x400px</p>
+                                    <input
+                                        type="file"
+                                        ref={profilePicInputRef}
+                                        onChange={handleProfilePicChange}
+                                        className="hidden"
+                                        accept="image/*"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">Business Name</label>
                                     <input
@@ -668,6 +743,25 @@ export default function AdminDashboard() {
                                         onChange={(e) => updateProfile({ website: e.target.value })}
                                     />
                                 </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                                    <input
+                                        type="text"
+                                        className="input-field"
+                                        value={phone}
+                                        onChange={(e) => updateProfile({ phone: e.target.value })}
+                                        placeholder="Leave blank to hide"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end">
+                                <button
+                                    onClick={handleSaveProfile}
+                                    className="btn-primary"
+                                >
+                                    Save Changes
+                                </button>
                             </div>
                         </div>
 

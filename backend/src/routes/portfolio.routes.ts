@@ -18,7 +18,18 @@ export default async function portfolioRoutes(fastify: FastifyInstance) {
      */
     fastify.get('/', async (request, reply) => {
         const images = await PortfolioService.getAllImages();
-        return { images };
+        const profile = await AuthService.getFirstAdminUser();
+
+        return {
+            images,
+            profile: profile ? {
+                business_name: profile.business_name,
+                website: profile.website,
+                phone: profile.phone,
+                email: profile.email,
+                profile_picture_path: profile.profile_picture_path
+            } : null
+        };
     });
 
     /**

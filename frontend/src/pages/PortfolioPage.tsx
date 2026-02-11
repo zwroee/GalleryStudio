@@ -124,16 +124,25 @@ export default function PortfolioPage() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    marginBottom: '2rem'
+                    marginBottom: '2rem',
+                    overflow: 'hidden'
                 }}>
-                    <span style={{
-                        fontFamily: 'var(--ffp-font-serif)',
-                        fontSize: '2.5rem',
-                        fontStyle: 'italic',
-                        color: 'var(--ffp-accent)'
-                    }}>
-                        {businessName.split(' ').map(w => w[0]).join('').slice(0, 2)}
-                    </span>
+                    {usePortfolioStore.getState().profilePictureUrl ? (
+                        <img
+                            src={usePortfolioStore.getState().profilePictureUrl!}
+                            alt={businessName}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                    ) : (
+                        <span style={{
+                            fontFamily: 'var(--ffp-font-serif)',
+                            fontSize: '2.5rem',
+                            fontStyle: 'italic',
+                            color: 'var(--ffp-accent)'
+                        }}>
+                            {businessName.split(' ').map(w => w[0]).join('').slice(0, 2)}
+                        </span>
+                    )}
                 </div>
 
                 <h1 style={{
@@ -171,20 +180,22 @@ export default function PortfolioPage() {
                         <Globe className="w-4 h-4" />
                         5fp.photo
                     </a>
-                    <a href={`tel:${phone}`} style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        color: 'var(--ffp-text-light)',
-                        textDecoration: 'none',
-                        transition: 'color 0.3s ease'
-                    }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = 'var(--ffp-accent)'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = 'var(--ffp-text-light)'}
-                    >
-                        <Phone className="w-4 h-4" />
-                        {phone}
-                    </a>
+                    {phone && (
+                        <a href={`tel:${phone}`} style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            color: 'var(--ffp-text-light)',
+                            textDecoration: 'none',
+                            transition: 'color 0.3s ease'
+                        }}
+                            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--ffp-accent)'}
+                            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--ffp-text-light)'}
+                        >
+                            <Phone className="w-4 h-4" />
+                            {phone}
+                        </a>
+                    )}
                     <a href={`mailto:${email}`} style={{
                         display: 'flex',
                         alignItems: 'center',

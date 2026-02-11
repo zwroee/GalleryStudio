@@ -30,6 +30,7 @@ interface PortfolioState {
     website: string;
     phone: string;
     email: string;
+    profilePictureUrl: string | null;
     images: PortfolioImage[];
     categories: string[];
     isLoading: boolean;
@@ -38,6 +39,8 @@ interface PortfolioState {
     // Actions
     fetchImages: () => Promise<void>;
     updateProfile: (data: Partial<PortfolioState>) => void;
+    saveProfile: () => Promise<void>;
+    uploadProfilePicture: (file: File) => Promise<void>;
     uploadImage: (file: File, category?: string) => Promise<void>;
     uploadImages: (files: File[], category: string, onProgress?: (progress: number) => void) => Promise<void>;
     removeImage: (id: string) => Promise<void>;
@@ -51,6 +54,7 @@ export const usePortfolioStore = create<PortfolioState>()(
             website: "www.5feathersphotography.com",
             phone: "209-900-2315",
             email: "5feathersphotos@gmail.com",
+            profilePictureUrl: null,
             images: [],
             categories: [
                 "ALL", "WEDDING", "FAMILY", "NEWBORN", "MATERNITY", "SENIOR", "BRANDING"
@@ -62,7 +66,22 @@ export const usePortfolioStore = create<PortfolioState>()(
                 set({ isLoading: true, error: null });
                 try {
                     const response = await api.get('/portfolio');
-                    set({ images: response.data.images, isLoading: false });
+                    const { images, profile } = response.data;
+
+                    const updates: Partial<PortfolioState> = {
+                        images,
+                        isLoading: false
+                    };
+
+                    if (profile) {
+                        updates.businessName = profile.business_name;
+                        updates.website = profile.website;
+                        updates.phone = profile.phone;
+                        updates.email = profile.email;
+                        updates.profilePictureUrl = profile.profile_picture_path ? `/storage/${profile.profile_picture_path}` : null;
+                    }
+
+                    set(updates);
                 } catch (err) {
                     console.error('Failed to fetch portfolio images:', err);
                     set({ error: 'Failed to load images', isLoading: false });
@@ -70,6 +89,38 @@ export const usePortfolioStore = create<PortfolioState>()(
             },
 
             updateProfile: (data) => set((state) => ({ ...state, ...data })),
+
+            saveProfile: async () => {
+                const state = get();
+                try {
+                    await api.put('/auth/profile', {
+                        business_name: state.businessName,
+                        website: state.website,
+                        phone: state.phone
+                    });
+                } catch (err) {
+                    console.error('Failed to save profile:', err);
+                    throw err;
+                }
+            },
+
+            uploadProfilePicture: async (file: File) => {
+                try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+
+                    const response = await api.post('/auth/profile-picture', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
+
+                    set({ profilePictureUrl: `/storage/${response.data.path}` });
+                } catch (err) {
+                    console.error('Failed to upload profile picture:', err);
+                    throw err;
+                }
+            },
 
             uploadImage: async (file: File, category?: string) => {
                 set({ isLoading: true, error: null });
@@ -169,8 +220,9 @@ export const usePortfolioStore = create<PortfolioState>()(
                 businessName: state.businessName,
                 website: state.website,
                 phone: state.phone,
-                email: state.email
-            }), // Only persist profile info, not images (fetch them fresh)
+                email: state.email,
+                profilePictureUrl: state.profilePictureUrl
+            }), // Only persist profile info
         }
     )
 );

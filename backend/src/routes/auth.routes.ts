@@ -63,6 +63,10 @@ export default async function authRoutes(fastify: FastifyInstance) {
                     username: user.username,
                     email: user.email,
                     watermark_logo_path: user.watermark_logo_path,
+                    business_name: user.business_name,
+                    website: user.website,
+                    phone: user.phone,
+                    profile_picture_path: user.profile_picture_path,
                 },
             };
         } catch (err) {
@@ -115,6 +119,93 @@ export default async function authRoutes(fastify: FastifyInstance) {
         } catch (err) {
             request.log.error(err);
             return reply.status(500).send({ error: 'Upload failed' });
+        }
+    });
+
+    /**
+     * POST /api/auth/profile-picture
+     * Upload profile picture
+     */
+    fastify.post('/profile-picture', async (request: FastifyRequest, reply: FastifyReply) => {
+        try {
+            await request.jwtVerify();
+            const payload = request.user as { id: string };
+
+            const data = await request.file();
+            if (!data) {
+                return reply.status(400).send({ error: 'No file uploaded' });
+            }
+
+            const buffer = await data.toBuffer();
+            const filename = `profile-${Date.now()}${path.extname(data.filename)}`;
+            const uploadDir = path.join('/storage', 'uploads');
+            const filePath = path.join(uploadDir, filename);
+
+            // Ensure directory exists
+            await fs.mkdir(uploadDir, { recursive: true });
+
+            // Delete old profile picture if exists
+            const user = await AuthService.getUserById(payload.id);
+            if (user && user.profile_picture_path) {
+                const oldPath = path.join('/storage', user.profile_picture_path);
+                try {
+                    await fs.unlink(oldPath);
+                } catch (err) {
+                    request.log.warn(`Failed to delete old profile picture: ${oldPath}`);
+                }
+            }
+
+            // Save file
+            await fs.writeFile(filePath, buffer);
+
+            const relativePath = `uploads/${filename}`;
+
+            // Update user record
+            await AuthService.updateProfile(payload.id, { profile_picture_path: relativePath });
+
+            return { success: true, path: relativePath };
+        } catch (err) {
+            request.log.error(err);
+            return reply.status(500).send({ error: 'Upload failed' });
+        }
+    });
+
+    /**
+     * PUT /api/auth/profile
+     * Update profile details
+     */
+    fastify.put('/profile', async (request: FastifyRequest, reply: FastifyReply) => {
+        try {
+            await request.jwtVerify();
+            const payload = request.user as { id: string };
+            const body = request.body as {
+                business_name?: string;
+                website?: string;
+                phone?: string;
+            };
+
+            const user = await AuthService.updateProfile(payload.id, body);
+
+            if (!user) {
+                return reply.status(404).send({ error: 'User not found' });
+            }
+
+            return {
+                message: 'Profile updated successfully',
+                user: {
+                    id: user.id,
+                    username: user.username,
+                    email: user.email,
+                    watermark_logo_path: user.watermark_logo_path,
+                    business_name: user.business_name,
+                    website: user.website,
+                    phone: user.phone,
+                    profile_picture_path: user.profile_picture_path,
+                }
+            };
+        } catch (err) {
+            request.log.error(err);
+            return reply.status(500).send({ error: 'Update failed' });
         }
     });
 

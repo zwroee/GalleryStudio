@@ -45,6 +45,10 @@ export interface AdminUser {
     password_hash: string;
     email: string;
     watermark_logo_path?: string | null;
+    business_name?: string;
+    website?: string;
+    phone?: string;
+    profile_picture_path?: string | null;
     created_at: Date;
 }
 
