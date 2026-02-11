@@ -1,6 +1,3 @@
-
-services:
-
 x-casaos:
   name:
     en: Gallery Studio
@@ -20,7 +17,10 @@ x-casaos:
     before_install:
       en: Ensure port 8080 is available.
   main: gallery-studio-nginx
-pass
+
+services:
+
+
 
   postgres:
     image: postgres:16-alpine
