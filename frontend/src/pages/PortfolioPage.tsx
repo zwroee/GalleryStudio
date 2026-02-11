@@ -378,11 +378,11 @@ export default function PortfolioPage() {
                 {/* Footer Navigation */}
                 <div className="ffp-footer-nav">
                     <div className="ffp-footer-nav-column">
-                        <a href="#portfolio">PORTFOLIO</a>
-                        <a href="#about">ABOUT</a>
+                        <Link to="/5feathers/portfolio">PORTFOLIO</Link>
+                        <Link to="/5feathers/about">ABOUT</Link>
                     </div>
                     <div className="ffp-footer-nav-column">
-                        <a href="#contact">CONTACT</a>
+                        <Link to="/5feathers/contact">CONTACT</Link>
                         <a href={socialLinks.website} target="_blank" rel="noreferrer">WEBSITE</a>
                     </div>
                 </div>
