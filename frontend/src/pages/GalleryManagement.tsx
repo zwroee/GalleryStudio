@@ -128,7 +128,10 @@ export default function GalleryManagement() {
     };
 
     const copyGalleryLink = async () => {
-        const link = `${window.location.origin}/gallery/${id}`;
+        const isDemo = import.meta.env.VITE_DEMO_MODE === 'true';
+        const link = isDemo
+            ? `${window.location.origin}${import.meta.env.BASE_URL}#/gallery/${id}`
+            : `${window.location.origin}/gallery/${id}`;
         try {
             await copyToClipboard(link);
             setCopied(true);

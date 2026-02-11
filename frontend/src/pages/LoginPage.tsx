@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { authApi } from '../services/api';
@@ -12,6 +12,13 @@ export default function LoginPage() {
 
     const login = useAuthStore((state) => state.login);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (import.meta.env.VITE_DEMO_MODE === 'true') {
+            setUsername('admin');
+            setPassword('demo');
+        }
+    }, []);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -38,6 +45,13 @@ export default function LoginPage() {
                         <h2 className="text-3xl font-serif font-bold text-gray-900 mb-2">Gallery Studio</h2>
                         <p className="text-gray-600">Enter your credentials to manage your portfolio.</p>
                     </div>
+
+                    {import.meta.env.VITE_DEMO_MODE === 'true' && (
+                        <div className="bg-blue-50 text-blue-600 p-3 rounded-md text-sm text-center mb-6 border border-blue-100">
+                            <strong>Demo Mode Enabled</strong><br />
+                            Credentials auto-filled for your convenience.
+                        </div>
+                    )}
 
                     <form onSubmit={handleLogin} className="space-y-6">
                         {error && (

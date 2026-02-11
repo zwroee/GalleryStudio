@@ -230,7 +230,13 @@ export default function AdminDashboard() {
                         </div>
                         <div className="flex gap-4">
                             <button
-                                onClick={() => window.open('/gallery-studio/portfolio', '_blank')}
+                                onClick={() => {
+                                    const isDemo = import.meta.env.VITE_DEMO_MODE === 'true';
+                                    const url = isDemo
+                                        ? `${import.meta.env.BASE_URL}#/gallery-studio/portfolio`
+                                        : '/gallery-studio/portfolio';
+                                    window.open(url, '_blank');
+                                }}
                                 className="btn-secondary flex items-center gap-2"
                             >
                                 <ExternalLink className="w-4 h-4" />
