@@ -1,24 +1,26 @@
 
 services:
-  x-casaos:
-    name:
-      en: Gallery Studio
-    icon: https://raw.githubusercontent.com/zwroee/gallery-studio/main/frontend/public/logo.png
-    author: Gallery Studio Team
-    category: Media
-    description:
-      en: A self-hosted photography gallery and portfolio platform.
-    tagline:
-      en: Professional Photo Gallery Management
-    developer: Gallery Studio
-    title:
-      en: Gallery Studio
-    thumbnail: https://raw.githubusercontent.com/zwroee/gallery-studio/main/frontend/public/logo.png
-    screenshot_link: []
-    tips:
-      before_install:
-        en: Ensure port 8080 is available.
-    main: gallery-studio-nginx
+
+x-casaos:
+  name:
+    en: Gallery Studio
+  icon: https://raw.githubusercontent.com/zwroee/gallery-studio/main/frontend/public/logo.png
+  author: Gallery Studio Team
+  category: Media
+  description:
+    en: A self-hosted photography gallery and portfolio platform.
+  tagline:
+    en: Professional Photo Gallery Management
+  developer: Gallery Studio
+  title:
+    en: Gallery Studio
+  thumbnail: https://raw.githubusercontent.com/zwroee/gallery-studio/main/frontend/public/logo.png
+  screenshot_link: []
+  tips:
+    before_install:
+      en: Ensure port 8080 is available.
+  main: gallery-studio-nginx
+pass
 
   postgres:
     image: postgres:16-alpine
