@@ -81,8 +81,8 @@ The frontend will be available at `http://localhost:5173` and will proxy API req
 ### 1. Clone and Configure
 
 ```bash
-git clone <your-repo>
-cd gallery-studio
+git clone https://github.com/zwroee/GalleryStudio
+cd GalleryStudio
 cp .env.example .env
 # Edit .env with secure passwords
 ```
@@ -90,19 +90,19 @@ cp .env.example .env
 ### 2. Build and Start
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 ### 3. Run Migrations
 
 ```bash
-docker-compose exec backend npm run migrate:up
+docker compose exec backend npm run migrate:up
 ```
 
 ### 4. Create Admin User
 
 ```bash
-docker-compose exec backend npm run create-admin
+docker compose exec backend npm run create-admin
 ```
 
 ### 5. Access
