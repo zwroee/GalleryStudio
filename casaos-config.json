@@ -1,0 +1,21 @@
+{
+    "name": "gallery-studio",
+    "version": "1.0.0",
+    "title": {
+        "en_us": "Gallery Studio"
+    },
+    "description": {
+        "en_us": "A self-hosted photography gallery and portfolio platform"
+    },
+    "tagline": {
+        "en_us": "Professional Photo Gallery Management"
+    },
+    "icon": "https://raw.githubusercontent.com/zwroee/gallery-studio/main/frontend/public/logo.png",
+    "thumbnail": "https://raw.githubusercontent.com/zwroee/gallery-studio/main/frontend/public/logo.png",
+    "author": "Gallery Studio Team",
+    "category": "Media",
+    "port_map": "3000",
+    "scheme": "http",
+    "index": "/",
+    "container_name": "gallery-studio-frontend"
+}

@@ -53,6 +53,10 @@ export interface AdminUser {
     notification_download_activity?: boolean;
     notification_weekly_summary?: boolean;
     notification_email?: string | null;
+    business_name?: string;
+    website?: string;
+    phone?: string;
+    profile_picture_path?: string | null;
 }
 
 // API Request/Response Types
@@ -63,12 +67,7 @@ export interface LoginRequest {
 
 export interface LoginResponse {
     token: string;
-    user: {
-        id: string;
-        username: string;
-        email: string;
-        watermark_logo_path: string | null;
-    };
+    user: AdminUser;
 }
 
 export interface CreateGalleryRequest {

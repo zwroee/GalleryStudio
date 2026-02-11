@@ -45,7 +45,7 @@ Automatically generates:
    ```
 
 2. **Set up PostgreSQL**:
-   - Create database: `pixiset`
+   - Create database: `gallery_studio`
    - Update `.env` with your DATABASE_URL
 
 3. **Run migrations**:

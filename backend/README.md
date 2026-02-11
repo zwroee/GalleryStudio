@@ -1,4 +1,4 @@
-# Pixiset Remake - Backend
+# Gallery Studio - Backend
 
 Self-hosted photo gallery platform backend built with Node.js, TypeScript, Fastify, and PostgreSQL.
 

@@ -291,7 +291,7 @@ export default function GallerySettingsModal({ onClose, onSave, gallery }: Galle
                                         <span className="font-medium text-neutral-900 font-sans">Make Public</span>
                                     </div>
                                     <p className="text-xs text-neutral-500 mt-1 font-sans">
-                                        Show this gallery on the public client galleries page (/5feathers/clients)
+                                        Show this gallery on the public client galleries page
                                     </p>
                                 </div>
                             </label>

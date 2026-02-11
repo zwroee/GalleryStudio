@@ -247,6 +247,17 @@ export default function ClientGalleryView() {
                     onClose={() => setShowDownloadModal(false)}
                 />
             )}
+
+            {/* Footer Branding */}
+            <footer className="bg-white border-t border-gray-200 py-8 mt-12">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center gap-2">
+                    <p className="text-sm text-gray-500">Powered by</p>
+                    <div className="flex items-center gap-2">
+                        <img src="/logo.png" alt="Gallery Studio" className="h-6 w-6 object-contain" />
+                        <span className="font-serif font-bold text-gray-900">Gallery Studio</span>
+                    </div>
+                </div>
+            </footer>
         </div>
     );
 }

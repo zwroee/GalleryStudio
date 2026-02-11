@@ -6,19 +6,19 @@ exports.up = (pgm) => {
     // Add business_name
     pgm.sql(`
         ALTER TABLE "admin_users" 
-        ADD COLUMN IF NOT EXISTS "business_name" varchar(255) DEFAULT 'FIVE FEATHERS PHOTOGRAPHY';
+        ADD COLUMN IF NOT EXISTS "business_name" varchar(255) DEFAULT 'Gallery Studio';
     `);
 
     // Add website
     pgm.sql(`
         ALTER TABLE "admin_users" 
-        ADD COLUMN IF NOT EXISTS "website" varchar(255) DEFAULT 'www.5feathersphotography.com';
+        ADD COLUMN IF NOT EXISTS "website" varchar(255) DEFAULT '';
     `);
 
     // Add phone
     pgm.sql(`
         ALTER TABLE "admin_users" 
-        ADD COLUMN IF NOT EXISTS "phone" varchar(50) DEFAULT '209-900-2315';
+        ADD COLUMN IF NOT EXISTS "phone" varchar(50) DEFAULT '';
     `);
 
     // Add profile_picture_path

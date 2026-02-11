@@ -1,4 +1,4 @@
-# Pixiset - Self-Hosted Photo Gallery Platform
+# Gallery Studio - Self-Hosted Photo Gallery Platform
 
 A production-ready, self-hosted photo gallery platform for photographers to deliver client galleries with password protection, favorites, and download capabilities.
 
@@ -82,7 +82,7 @@ The frontend will be available at `http://localhost:5173` and will proxy API req
 
 ```bash
 git clone <your-repo>
-cd pixiset-remake
+cd gallery-studio
 cp .env.example .env
 # Edit .env with secure passwords
 ```
@@ -110,10 +110,27 @@ docker-compose exec backend npm run create-admin
 - Frontend: `http://your-server`
 - Admin: `http://your-server/admin`
 
+## CasaOS Installation
+
+1. Open the **App Store** in your CasaOS dashboard.
+2. Click on **Custom Install** (top right).
+3. Select **Import** and paste the content of `casaos-config.json` OR import the `docker-compose.yml` file directly.
+4. Ensure the ports (8080) are not in use.
+5. Click **Install**.
+
+## GitHub Pages Demo
+
+A static demo of the frontend is available. To deploy:
+
+1. Enable GitHub Pages in your repository settings (Source: GitHub Actions).
+2. Push to the `main` branch.
+3. The "Deploy Demo" workflow will automatically build and deploy the demo to your Pages URL.
+4. Access the demo at `https://<username>.github.io/gallery-studio/`.
+
 ## Project Structure
 
 ```
-pixiset-remake/
+gallery-studio/
 ├── backend/              # Node.js backend
 │   ├── src/
 │   │   ├── config/      # Database & env config
@@ -178,7 +195,7 @@ RAW and HEIC formats are automatically converted to JPEG.
 ### Backend (.env)
 ```env
 PORT=3000
-DATABASE_URL=postgresql://user:password@localhost:5432/pixiset
+DATABASE_URL=postgresql://user:password@localhost:5432/gallery_studio
 JWT_SECRET=your-secret-key
 STORAGE_PATH=/storage/galleries
 MAX_UPLOAD_SIZE=524288000  # 500MB

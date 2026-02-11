@@ -1,5 +1,5 @@
 {
-  "name": "pixiset-backend",
+  "name": "gallery-studio-backend",
   "version": "1.0.0",
   "description": "Self-hosted photo gallery platform backend",
   "main": "dist/server.js",

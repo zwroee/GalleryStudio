@@ -74,13 +74,13 @@ export default function PortfolioPage() {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [lightboxIndex, nextImage, prevImage]);
 
-    // Real social media links
+    // Social media links - configure in admin panel
     const socialLinks = {
-        instagram: 'https://www.instagram.com/fivefeathersphotographybyerika',
-        facebook: 'https://www.facebook.com/FiveFeathersPhotographybyErika/',
-        tiktok: 'https://www.tiktok.com/@fivefeathersphoto',
-        youtube: 'https://www.youtube.com/@FiveFeathersPhotography-ft5li',
-        website: 'http://5fp.photo/'
+        instagram: '',
+        facebook: '',
+        tiktok: '',
+        youtube: '',
+        website: website || ''
     };
 
     return (
@@ -382,19 +382,17 @@ export default function PortfolioPage() {
                         rel="noopener noreferrer"
                         className="instagram-handle"
                     >
-                        @FIVEFEATHERSPHOTOGRAPHYBYERIKA
+                        @GalleryStudio
                     </a>
                 </div>
 
                 {/* Footer Navigation */}
                 <div className="ffp-footer-nav">
                     <div className="ffp-footer-nav-column">
-                        <Link to="/5feathers/portfolio">PORTFOLIO</Link>
-                        <Link to="/5feathers/about">ABOUT</Link>
+                        <Link to="/gallery-studio/portfolio">PORTFOLIO</Link>
                     </div>
                     <div className="ffp-footer-nav-column">
-                        <Link to="/5feathers/contact">CONTACT</Link>
-                        <a href={socialLinks.website} target="_blank" rel="noreferrer">WEBSITE</a>
+                        <Link to="/gallery-studio">LOGIN</Link>
                     </div>
                 </div>
 

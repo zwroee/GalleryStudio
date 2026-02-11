@@ -1,23 +1,43 @@
 
 services:
+  x-casaos:
+    name:
+      en: Gallery Studio
+    icon: https://raw.githubusercontent.com/zwroee/gallery-studio/main/frontend/public/logo.png
+    author: Gallery Studio Team
+    category: Media
+    description:
+      en: A self-hosted photography gallery and portfolio platform.
+    tagline:
+      en: Professional Photo Gallery Management
+    developer: Gallery Studio
+    title:
+      en: Gallery Studio
+    thumbnail: https://raw.githubusercontent.com/zwroee/gallery-studio/main/frontend/public/logo.png
+    screenshot_link: []
+    tips:
+      before_install:
+        en: Ensure port 8080 is available.
+    main: gallery-studio-nginx
+
   postgres:
     image: postgres:16-alpine
-    container_name: pixiset-db
+    container_name: gallery-studio-db
     environment:
-      POSTGRES_DB: pixiset
-      POSTGRES_USER: pixiset
+      POSTGRES_DB: gallery_studio
+      POSTGRES_USER: gallery_studio
       POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - pixiset_network
+      - gallery_studio_network
     restart: unless-stopped
 
   backend:
     build: ./backend
-    container_name: pixiset-backend
+    container_name: gallery-studio-backend
     environment:
-      DATABASE_URL: postgresql://pixiset:${DB_PASSWORD:-changeme}@postgres:5432/pixiset
+      DATABASE_URL: postgresql://gallery_studio:${DB_PASSWORD:-changeme}@postgres:5432/gallery_studio
       JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-this}
       STORAGE_PATH: /storage
       NODE_ENV: production
@@ -26,19 +46,32 @@ services:
     depends_on:
       - postgres
     networks:
-      - pixiset_network
+      - gallery_studio_network
     restart: unless-stopped
 
   frontend:
     build: ./frontend
-    container_name: pixiset-frontend
+    container_name: gallery-studio-frontend
     networks:
-      - pixiset_network
+      - gallery_studio_network
     restart: unless-stopped
 
   nginx:
     image: nginx:alpine
-    container_name: pixiset-nginx
+    container_name: gallery-studio-nginx
+    x-casaos:
+      envs: []
+      ports:
+        - container: "80"
+          description:
+            en: Web UI Port
+      volumes:
+        - container: /etc/nginx/nginx.conf
+          description:
+            en: Nginx Configuration
+        - container: /storage
+          description:
+            en: Storage Directory
     ports:
       - "8080:80"
       - "8443:443"
@@ -50,12 +83,12 @@ services:
       - backend
       - frontend
     networks:
-      - pixiset_network
+      - gallery_studio_network
     restart: unless-stopped
 
 volumes:
   postgres_data:
 
 networks:
-  pixiset_network:
+  gallery_studio_network:
     driver: bridge

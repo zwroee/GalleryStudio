@@ -50,10 +50,10 @@ interface PortfolioState {
 export const usePortfolioStore = create<PortfolioState>()(
     persist(
         (set, get) => ({
-            businessName: "FIVE FEATHERS PHOTOGRAPHY",
-            website: "www.5feathersphotography.com",
-            phone: "209-900-2315",
-            email: "5feathersphotos@gmail.com",
+            businessName: "Gallery Studio",
+            website: "",
+            phone: "",
+            email: "",
             profilePictureUrl: null,
             images: [],
             categories: [
