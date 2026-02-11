@@ -25,9 +25,10 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
+import { MOCK_USER, MOCK_GALLERIES, MOCK_GALLERY_WITH_PHOTOS, MOCK_PORTFOLIO_IMAGES, MOCK_PORTFOLIO_PROFILE } from './mockData';
+
 // Demo Mode Check
 const isDemo = import.meta.env.VITE_DEMO_MODE === 'true';
-import { MOCK_USER, MOCK_GALLERIES, MOCK_GALLERY_WITH_PHOTOS, MOCK_PORTFOLIO_IMAGES, MOCK_PORTFOLIO_PROFILE } from './mockData';
 
 // Mock Adapter for Demo Mode (Simple interception)
 if (isDemo) {

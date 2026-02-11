@@ -64,7 +64,11 @@ export const usePortfolioStore = create<PortfolioState>()(
                         updates.website = profile.website;
                         updates.phone = profile.phone;
                         updates.email = profile.email;
-                        updates.profilePictureUrl = profile.profile_picture_path ? `/storage/${profile.profile_picture_path}` : null;
+                        if (profile.profile_picture_path?.startsWith('http')) {
+                            updates.profilePictureUrl = profile.profile_picture_path;
+                        } else {
+                            updates.profilePictureUrl = profile.profile_picture_path ? `/storage/${profile.profile_picture_path}` : null;
+                        }
                     }
 
                     set(updates);

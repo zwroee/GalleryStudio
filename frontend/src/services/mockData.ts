@@ -105,5 +105,5 @@ export const MOCK_PORTFOLIO_PROFILE = {
     website: 'https://gallerystudio.demo',
     phone: '555-0123',
     email: 'demo@gallerystudio.com',
-    profile_picture_path: 'demo/profile.jpg'
+    profile_picture_path: 'https://ui-avatars.com/api/?name=Gallery+Studio&background=0D8ABC&color=fff&size=256'
 };

@@ -34,7 +34,7 @@ export default function LoginPage() {
             <div className="max-w-md w-full bg-white rounded-lg shadow-xl overflow-hidden">
                 <div className="px-8 py-12">
                     <div className="text-center mb-8">
-                        <img src="/logo.png" alt="Gallery Studio" className="mx-auto h-16 w-auto mb-4 object-contain" />
+                        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Gallery Studio" className="mx-auto h-16 w-auto mb-4 object-contain" />
                         <h2 className="text-3xl font-serif font-bold text-gray-900 mb-2">Gallery Studio</h2>
                         <p className="text-gray-600">Enter your credentials to manage your portfolio.</p>
                     </div>

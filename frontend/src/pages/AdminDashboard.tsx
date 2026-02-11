@@ -222,7 +222,7 @@ export default function AdminDashboard() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <img src="/logo.png" alt="Gallery Studio" className="h-10 w-10 object-contain p-1 bg-gray-50 rounded-lg border border-gray-200" />
+                            <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Gallery Studio" className="h-10 w-10 object-contain p-1 bg-gray-50 rounded-lg border border-gray-200" />
                             <div>
                                 <h1 className="text-2xl font-bold text-gray-900">Gallery Studio Admin</h1>
                                 <p className="text-sm text-gray-600">Welcome back, {user?.username}</p>
