@@ -60,7 +60,7 @@ services:
       icon: https://raw.githubusercontent.com/zwroee/GalleryStudio/dd5a00a8152d7b230f0545da1da6a4b6619040b4/logo.png
 
   frontend:
-    image: ${FRONTEND_IMAGE:-ghcr.io/zwroee/gallerystudio-frontend:latest}
+    image: ghcr.io/zwroee/gallerystudio-frontend:latest
     container_name: gallery-studio-frontend
     hostname: gallery-studio-frontend
     networks:
@@ -70,10 +70,6 @@ services:
       title:
         en: Frontend UI
       icon: https://raw.githubusercontent.com/zwroee/GalleryStudio/dd5a00a8152d7b230f0545da1da6a4b6619040b4/logo.png
-      envs:
-        - container: FRONTEND_IMAGE
-          description:
-            en: "Frontend image variant: 'ghcr.io/zwroee/gallerystudio-frontend:latest' for production or 'ghcr.io/zwroee/gallerystudio-frontend:demo' for demo mode"
 
   nginx:
     image: nginx:alpine

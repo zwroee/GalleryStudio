@@ -2,10 +2,6 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Accept build argument for demo mode
-ARG VITE_DEMO_MODE=false
-ENV VITE_DEMO_MODE=${VITE_DEMO_MODE}
-
 COPY package*.json ./
 RUN npm ci
 
