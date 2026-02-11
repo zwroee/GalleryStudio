@@ -116,8 +116,8 @@ export default function PortfolioPage() {
             }}>
                 {/* Logo Placeholder */}
                 <div style={{
-                    width: '120px',
-                    height: '120px',
+                    width: '300px',
+                    height: '300px',
                     borderRadius: '50%',
                     background: 'var(--ffp-secondary)',
                     border: '2px solid var(--ffp-accent)',
@@ -136,7 +136,7 @@ export default function PortfolioPage() {
                     ) : (
                         <span style={{
                             fontFamily: 'var(--ffp-font-serif)',
-                            fontSize: '2.5rem',
+                            fontSize: '6rem',
                             fontStyle: 'italic',
                             color: 'var(--ffp-accent)'
                         }}>
