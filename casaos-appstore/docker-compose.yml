@@ -117,7 +117,8 @@ x-casaos:
       **Learn More:**
       - [Gallery Studio GitHub](https://github.com/zwroee/GalleryStudio)
       - [Documentation](https://github.com/zwroee/GalleryStudio#readme)
-  screenshot_link: []
+  screenshot_link:
+    - https://cdn.jsdelivr.net/gh/zwroee/GalleryStudio@main/casaos-appstore/screenshot-1.png
   tips:
     before_install:
       en_us: |
