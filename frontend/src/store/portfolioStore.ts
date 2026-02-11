@@ -31,6 +31,10 @@ interface PortfolioState {
     phone: string;
     email: string;
     profilePictureUrl: string | null;
+    notification_new_favorites: boolean;
+    notification_download_activity: boolean;
+    notification_weekly_summary: boolean;
+    notification_email: string | null;
     images: PortfolioImage[];
     categories: string[];
     isLoading: boolean;
@@ -55,6 +59,10 @@ export const usePortfolioStore = create<PortfolioState>()(
             phone: "209-900-2315",
             email: "5feathersphotos@gmail.com",
             profilePictureUrl: null,
+            notification_new_favorites: false,
+            notification_download_activity: false,
+            notification_weekly_summary: false,
+            notification_email: "",
             images: [],
             categories: [
                 "ALL", "WEDDING", "FAMILY", "NEWBORN", "MATERNITY", "SENIOR", "BRANDING"
@@ -79,6 +87,10 @@ export const usePortfolioStore = create<PortfolioState>()(
                         updates.phone = profile.phone;
                         updates.email = profile.email;
                         updates.profilePictureUrl = profile.profile_picture_path ? `/storage/${profile.profile_picture_path}` : null;
+                        updates.notification_new_favorites = profile.notification_new_favorites;
+                        updates.notification_download_activity = profile.notification_download_activity;
+                        updates.notification_weekly_summary = profile.notification_weekly_summary;
+                        updates.notification_email = profile.notification_email;
                     }
 
                     set(updates);
@@ -96,7 +108,11 @@ export const usePortfolioStore = create<PortfolioState>()(
                     await api.put('/auth/profile', {
                         business_name: state.businessName,
                         website: state.website,
-                        phone: state.phone
+                        phone: state.phone,
+                        notification_new_favorites: state.notification_new_favorites,
+                        notification_download_activity: state.notification_download_activity,
+                        notification_weekly_summary: state.notification_weekly_summary,
+                        notification_email: state.notification_email,
                     });
                 } catch (err) {
                     console.error('Failed to save profile:', err);
@@ -221,7 +237,11 @@ export const usePortfolioStore = create<PortfolioState>()(
                 website: state.website,
                 phone: state.phone,
                 email: state.email,
-                profilePictureUrl: state.profilePictureUrl
+                profilePictureUrl: state.profilePictureUrl,
+                notification_new_favorites: state.notification_new_favorites,
+                notification_download_activity: state.notification_download_activity,
+                notification_weekly_summary: state.notification_weekly_summary,
+                notification_email: state.notification_email,
             }), // Only persist profile info
         }
     )
