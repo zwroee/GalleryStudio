@@ -83,10 +83,6 @@ services:
         - container: "80"
           description:
             en: Web UI Port
-      volumes:
-        - container: /storage
-          description:
-            en: Storage Directory
     ports:
       - "8080:80"
       - "8443:443"
