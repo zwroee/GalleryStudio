@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, LogOut, Image as ImageIcon, Lock, Trash2, Upload, ExternalLink, Eye, Download, Heart, Settings, CheckSquare, Square, BarChart3, TrendingUp, Users, Calendar, Mail } from 'lucide-react';
+import { Plus, LogOut, Image as ImageIcon, Lock, Trash2, Upload, ExternalLink, Eye, Download, Heart, Settings, CheckSquare, Square, BarChart3, TrendingUp, Users, Calendar } from 'lucide-react';
 import { galleryApi, authApi } from '../services/api';
 import { useAuthStore } from '../store/authStore';
 import { usePortfolioStore } from '../store/portfolioStore';
@@ -33,11 +33,7 @@ export default function AdminDashboard() {
         profilePictureUrl,
         saveProfile,
         uploadProfilePicture,
-        fetchImages: fetchPortfolioImages,
-        notification_new_favorites,
-        notification_download_activity,
-        notification_weekly_summary,
-        notification_email
+        fetchImages: fetchPortfolioImages
     } = usePortfolioStore();
 
     // Ref for file input
@@ -760,96 +756,6 @@ export default function AdminDashboard() {
                             </div>
 
                             <div className="flex justify-end">
-                                <button
-                                    onClick={handleSaveProfile}
-                                    className="btn-primary"
-                                >
-                                    Save Changes
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Notification Settings */}
-                        <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Notification Preferences</h3>
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h4 className="text-sm font-medium text-gray-900">New Favorites</h4>
-                                        <p className="text-xs text-gray-500">Receive an email when a client favorites a photo</p>
-                                    </div>
-                                    <button
-                                        onClick={() => updateProfile({ notification_new_favorites: !notification_new_favorites })}
-                                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${notification_new_favorites ? 'bg-primary-600' : 'bg-gray-200'}`}
-                                    >
-                                        <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${notification_new_favorites ? 'translate-x-5' : 'translate-x-0'}`} />
-                                    </button>
-                                </div>
-
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h4 className="text-sm font-medium text-gray-900">Download Activity</h4>
-                                        <p className="text-xs text-gray-500">Receive an email when photos are downloaded</p>
-                                    </div>
-                                    <button
-                                        onClick={() => updateProfile({ notification_download_activity: !notification_download_activity })}
-                                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${notification_download_activity ? 'bg-primary-600' : 'bg-gray-200'}`}
-                                    >
-                                        <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${notification_download_activity ? 'translate-x-5' : 'translate-x-0'}`} />
-                                    </button>
-                                </div>
-
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h4 className="text-sm font-medium text-gray-900">Weekly Summary</h4>
-                                        <p className="text-xs text-gray-500">Receive a weekly summary of gallery activity</p>
-                                    </div>
-                                    <button
-                                        onClick={() => updateProfile({ notification_weekly_summary: !notification_weekly_summary })}
-                                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${notification_weekly_summary ? 'bg-primary-600' : 'bg-gray-200'}`}
-                                    >
-                                        <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${notification_weekly_summary ? 'translate-x-5' : 'translate-x-0'}`} />
-                                    </button>
-                                </div>
-
-                                <div className="pt-4 border-t border-gray-100">
-                                    <label className="block text-sm font-medium text-neutral-700 mb-2 font-sans">
-                                        <Mail className="w-4 h-4 inline mr-1" />
-                                        Notification Email
-                                    </label>
-                                    <input
-                                        type="email"
-                                        value={notification_email || ''}
-                                        onChange={(e) => updateProfile({ notification_email: e.target.value })}
-                                        className="input-field"
-                                        placeholder={user?.email || 'Enter email'}
-                                    />
-                                    <p className="text-xs text-neutral-500 mt-1">
-                                        Leave blank to use your account email ({user?.email})
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="flex justify-between items-center mt-6 gap-4">
-                                <button
-                                    onClick={async () => {
-                                        try {
-                                            const targetEmail = notification_email || user?.email;
-                                            if (!targetEmail) {
-                                                alert('Please provide an email address');
-                                                return;
-                                            }
-                                            const result = await authApi.sendTestEmail(targetEmail);
-                                            alert(result.message || 'Test email sent!');
-                                        } catch (err) {
-                                            console.error('Test email failed:', err);
-                                            alert('Failed to send test email. Check console for details.');
-                                        }
-                                    }}
-                                    className="btn-secondary flex items-center gap-2"
-                                >
-                                    <Mail className="w-4 h-4" />
-                                    Send Test Email
-                                </button>
                                 <button
                                     onClick={handleSaveProfile}
                                     className="btn-primary"
