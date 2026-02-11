@@ -1,7 +1,7 @@
 x-casaos:
   name:
     en: Gallery Studio
-  icon: https://raw.githubusercontent.com/zwroee/gallery-studio/main/frontend/public/logo.png
+  icon: https://raw.githubusercontent.com/zwroee/GalleryStudio/main/frontend/public/logo.png
   author: Gallery Studio Team
   category: Media
   description:
@@ -11,7 +11,7 @@ x-casaos:
   developer: Gallery Studio
   title:
     en: Gallery Studio
-  thumbnail: https://raw.githubusercontent.com/zwroee/gallery-studio/main/frontend/public/logo.png
+  thumbnail: https://raw.githubusercontent.com/zwroee/GalleryStudio/main/frontend/public/logo.png
   screenshot_link: []
   tips:
     before_install:

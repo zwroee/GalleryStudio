@@ -10,8 +10,8 @@
     "tagline": {
         "en_us": "Professional Photo Gallery Management"
     },
-    "icon": "https://raw.githubusercontent.com/zwroee/gallery-studio/main/frontend/public/logo.png",
-    "thumbnail": "https://raw.githubusercontent.com/zwroee/gallery-studio/main/frontend/public/logo.png",
+    "icon": "https://raw.githubusercontent.com/zwroee/GalleryStudio/main/frontend/public/logo.png",
+    "thumbnail": "https://raw.githubusercontent.com/zwroee/GalleryStudio/main/frontend/public/logo.png",
     "author": "Gallery Studio Team",
     "category": "Media",
     "port_map": "3000",
