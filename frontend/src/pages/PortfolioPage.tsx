@@ -76,11 +76,6 @@ export default function PortfolioPage() {
 
     // Social media links - configure in admin panel
     const socialLinks = {
-        instagram: '',
-        facebook: '',
-        tiktok: '',
-        youtube: '',
-        website: website || '',
         github: 'https://github.com/zwroee/GalleryStudio'
     };
 
@@ -95,31 +90,20 @@ export default function PortfolioPage() {
                 className="fixed top-0 right-0 z-50 p-4 text-neutral-400 hover:text-neutral-900 transition-colors duration-300"
                 aria-label="View on GitHub"
             >
-                <Github className="w-6 h-6" />
+                <Github className="w-8 h-8" />
             </a>
 
-            {/* Navigation */}
+            {/* Navigation (Minimal) */}
             <nav className="w-full py-6 px-4 md:px-8 bg-neutral-50/80 backdrop-blur-sm sticky top-0 z-40 border-b border-neutral-100">
-                <div className="max-w-7xl mx-auto flex justify-between items-center">
-                    <div className="w-1/3 md:w-1/4">
-                        {/* Placeholder for left nav items if needed */}
-                    </div>
-
-                    <div className="w-1/3 md:w-1/2 flex justify-center">
-                        <Link to="/" className="text-xl md:text-2xl font-serif tracking-widest uppercase hover:opacity-70 transition-opacity">
-                            {businessName}
-                        </Link>
-                    </div>
-
-                    <div className="w-1/3 md:w-1/4 flex justify-end gap-6 text-xs tracking-widest font-medium">
-                        {/* Right nav items */}
-                        <Link to="/gallery-studio" className="hover:text-neutral-500 transition-colors">LOGIN</Link>
-                    </div>
+                <div className="max-w-7xl mx-auto flex justify-center items-center">
+                    <Link to="/" className="text-xl md:text-2xl font-serif tracking-widest uppercase hover:opacity-70 transition-opacity">
+                        {businessName}
+                    </Link>
                 </div>
             </nav>
 
             {/* Header Section */}
-            <header className="flex flex-col items-center justify-center pt-20 pb-16 px-4 text-center">
+            <header className="flex flex-col items-center justify-center pt-20 pb-12 px-4 text-center">
                 {/* Logo */}
                 <div className="w-48 h-48 md:w-64 md:h-64 rounded-full border-2 border-neutral-200 p-2 mb-8 transition-transform hover:scale-105 duration-700 ease-out">
                     <div className="w-full h-full rounded-full overflow-hidden bg-white shadow-sm flex items-center justify-center">
@@ -139,30 +123,9 @@ export default function PortfolioPage() {
                     </div>
                 </div>
 
-                <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl tracking-widest font-light mb-8 text-neutral-800 uppercase">
+                <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl tracking-widest font-light mb-4 text-neutral-800 uppercase">
                     {businessName}
                 </h1>
-
-                <div className="flex flex-wrap justify-center gap-6 md:gap-8 text-sm md:text-base font-light text-neutral-500 tracking-wide">
-                    {socialLinks.website && (
-                        <a href={socialLinks.website} target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-neutral-900 transition-colors group">
-                            <Globe className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                            <span>Website</span>
-                        </a>
-                    )}
-                    {phone && (
-                        <a href={`tel:${phone}`} className="flex items-center gap-2 hover:text-neutral-900 transition-colors group">
-                            <Phone className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                            <span>{phone}</span>
-                        </a>
-                    )}
-                    {email && (
-                        <a href={`mailto:${email}`} className="flex items-center gap-2 hover:text-neutral-900 transition-colors group">
-                            <Mail className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                            <span>Contact</span>
-                        </a>
-                    )}
-                </div>
             </header>
 
             {/* Navigation Categories */}
@@ -275,51 +238,21 @@ export default function PortfolioPage() {
             )}
 
             {/* Footer */}
-            <footer className="bg-white border-t border-neutral-100 pt-16 pb-8 px-4 text-center">
+            <footer className="bg-white border-t border-neutral-100 py-12 px-4 text-center">
                 <div className="max-w-4xl mx-auto flex flex-col items-center">
-
-                    {/* Instagram Feature */}
-                    <div className="mb-12 flex flex-col items-center">
-                        <Instagram className="w-6 h-6 mb-4 text-neutral-800" />
-                        <h3 className="font-serif text-lg mb-2">Instagram</h3>
-                        <a
-                            href={socialLinks.instagram}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-neutral-500 hover:text-neutral-900 transition-colors tracking-widest text-sm"
-                        >
-                            @GalleryStudio
-                        </a>
-                    </div>
-
-                    {/* Footer Nav */}
-                    <div className="flex flex-col md:flex-row gap-8 md:gap-16 mb-12 text-xs font-medium tracking-[0.2em] text-neutral-400">
-                        <Link to="/gallery-studio/portfolio" className="hover:text-neutral-900 transition-colors">PORTFOLIO</Link>
-                        <a href={socialLinks.github} target="_blank" rel="noopener noreferrer" className="hover:text-neutral-900 transition-colors">GITHUB</a>
-                        <Link to="/gallery-studio" className="hover:text-neutral-900 transition-colors">LOGIN</Link>
-                    </div>
 
                     {/* Back to Top */}
                     <button
                         onClick={scrollToTop}
-                        className="mb-12 p-3 rounded-full border border-neutral-200 text-neutral-400 hover:text-neutral-900 hover:border-neutral-900 transition-all duration-300 hover:-translate-y-1"
+                        className="mb-8 p-3 rounded-full border border-neutral-200 text-neutral-400 hover:text-neutral-900 hover:border-neutral-900 transition-all duration-300 hover:-translate-y-1"
                         aria-label="Back to top"
                     >
                         <ArrowUp className="w-5 h-5" />
                     </button>
 
-                    <div className="w-full border-t border-neutral-100 my-8"></div>
-
-                    {/* Bottom */}
-                    <div className="flex flex-col md:flex-row justify-between items-center w-full max-w-7xl animate-in fade-in slide-in-from-bottom-4 duration-700">
-                        <p className="text-xs text-neutral-400 tracking-wide mb-4 md:mb-0">
-                            © {new Date().getFullYear()} {businessName}. All rights reserved.
-                        </p>
-
-                        <div className="flex gap-6 text-neutral-400">
-                            <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="hover:text-neutral-900 transition-colors"><Facebook className="w-4 h-4" /></a>
-                            <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="hover:text-neutral-900 transition-colors"><Instagram className="w-4 h-4" /></a>
-                        </div>
+                    {/* Copyright */}
+                    <div className="text-xs text-neutral-400 tracking-wide">
+                        <p>© {new Date().getFullYear()} {businessName}. All rights reserved.</p>
                     </div>
                 </div>
             </footer>
