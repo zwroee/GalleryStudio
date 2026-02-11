@@ -1,7 +1,7 @@
 x-casaos:
   name:
     en: Gallery Studio
-  icon: https://raw.githubusercontent.com/zwroee/GalleryStudio/main/frontend/public/logo.png
+  icon: https://raw.githubusercontent.com/zwroee/GalleryStudio/dd5a00a8152d7b230f0545da1da6a4b6619040b4/logo.png
   author: Gallery Studio Team
   category: Media
   description:
@@ -11,7 +11,7 @@ x-casaos:
   developer: Gallery Studio
   title:
     en: Gallery Studio
-  thumbnail: https://raw.githubusercontent.com/zwroee/GalleryStudio/main/frontend/public/logo.png
+  thumbnail: https://raw.githubusercontent.com/zwroee/GalleryStudio/dd5a00a8152d7b230f0545da1da6a4b6619040b4/logo.png
   screenshot_link: []
   tips:
     before_install:
@@ -32,6 +32,9 @@ services:
     networks:
       - gallery_studio_network
     restart: unless-stopped
+    x-casaos:
+      title:
+        en: Database
 
   backend:
     image: ghcr.io/zwroee/gallerystudio-backend:latest
@@ -48,6 +51,9 @@ services:
     networks:
       - gallery_studio_network
     restart: unless-stopped
+    x-casaos:
+      title:
+        en: Backend API
 
   frontend:
     image: ghcr.io/zwroee/gallerystudio-frontend:latest
@@ -55,11 +61,16 @@ services:
     networks:
       - gallery_studio_network
     restart: unless-stopped
+    x-casaos:
+      title:
+        en: Frontend UI
 
   nginx:
     image: nginx:alpine
     container_name: gallery-studio-nginx
     x-casaos:
+      title:
+        en: Gallery Studio
       envs: []
       ports:
         - container: "80"
