@@ -48,7 +48,7 @@ services:
       STORAGE_PATH: /storage
       NODE_ENV: production
     volumes:
-      - /DATA/GalleryStudio/storage:/storage
+      - gallery_storage:/storage
     depends_on:
       - postgres
     networks:
@@ -91,7 +91,7 @@ services:
       - "8080:80"
       - "8443:443"
     volumes:
-      - /DATA/GalleryStudio/storage:/storage:ro
+      - gallery_storage:/storage:ro
     depends_on:
       - backend
       - frontend
@@ -130,6 +130,7 @@ services:
 
 volumes:
   postgres_data:
+  gallery_storage:
 
 networks:
   gallery_studio_network:
