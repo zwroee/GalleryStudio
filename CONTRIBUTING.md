@@ -81,7 +81,6 @@ Looking for something to work on? Here are some areas where we need help:
 -   [ ] **Accessibility**: Audit and improve a11y across the application (ARIA labels, keyboard navigation).
 -   [ ] **Localization**: Add support for multiple languages (i18n).
 -   [ ] **Cloud Storage**: Add support for S3-compatible storage providers (AWS S3, MinIO, Backblaze B2, R2).
--   [ ] **Social Login**: Allow clients to access restricted galleries using Google/Facebook login.
 -   [ ] **Watermarking Engine**: Improve the watermark system (dynamic positioning, tiling, opacity controls).
 -   [ ] **Themes**: Implement a theming system for client galleries.
 -   [ ] **Documentation**: Improve API documentation and setup guides.
