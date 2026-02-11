@@ -23,6 +23,7 @@ services:
   postgres:
     image: postgres:16-alpine
     container_name: gallery-studio-db
+    hostname: gallery-studio-db
     environment:
       POSTGRES_DB: gallery_studio
       POSTGRES_USER: gallery_studio
@@ -35,10 +36,12 @@ services:
     x-casaos:
       title:
         en: Database
+      icon: https://raw.githubusercontent.com/zwroee/GalleryStudio/dd5a00a8152d7b230f0545da1da6a4b6619040b4/logo.png
 
   backend:
     image: ghcr.io/zwroee/gallerystudio-backend:latest
     container_name: gallery-studio-backend
+    hostname: gallery-studio-backend
     environment:
       DATABASE_URL: postgresql://gallery_studio:${DB_PASSWORD:-changeme}@postgres:5432/gallery_studio
       JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-this}
@@ -54,24 +57,28 @@ services:
     x-casaos:
       title:
         en: Backend API
+      icon: https://raw.githubusercontent.com/zwroee/GalleryStudio/dd5a00a8152d7b230f0545da1da6a4b6619040b4/logo.png
 
   frontend:
     image: ghcr.io/zwroee/gallerystudio-frontend:latest
     container_name: gallery-studio-frontend
+    hostname: gallery-studio-frontend
     networks:
       - gallery_studio_network
     restart: unless-stopped
     x-casaos:
       title:
         en: Frontend UI
+      icon: https://raw.githubusercontent.com/zwroee/GalleryStudio/dd5a00a8152d7b230f0545da1da6a4b6619040b4/logo.png
 
   nginx:
     image: nginx:alpine
     container_name: gallery-studio-nginx
+    hostname: gallery-studio-nginx
     x-casaos:
       title:
         en: Gallery Studio
-      envs: []
+      icon: https://raw.githubusercontent.com/zwroee/GalleryStudio/dd5a00a8152d7b230f0545da1da6a4b6619040b4/logo.png
       ports:
         - container: "80"
           description:
