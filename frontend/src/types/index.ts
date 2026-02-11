@@ -52,6 +52,7 @@ export interface AdminUser {
     notification_new_favorites?: boolean;
     notification_download_activity?: boolean;
     notification_weekly_summary?: boolean;
+    notification_email?: string | null;
 }
 
 // API Request/Response Types

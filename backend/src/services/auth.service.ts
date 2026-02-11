@@ -124,6 +124,7 @@ export class AuthService {
         notification_new_favorites?: boolean;
         notification_download_activity?: boolean;
         notification_weekly_summary?: boolean;
+        notification_email?: string;
     }): Promise<AdminUser | null> {
         const updates: string[] = [];
         const values: any[] = [];
@@ -156,6 +157,10 @@ export class AuthService {
         if (data.notification_weekly_summary !== undefined) {
             updates.push(`notification_weekly_summary = $${paramIndex++}`);
             values.push(data.notification_weekly_summary);
+        }
+        if (data.notification_email !== undefined) {
+            updates.push(`notification_email = $${paramIndex++}`);
+            values.push(data.notification_email);
         }
 
         if (updates.length === 0) return null;

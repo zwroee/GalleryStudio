@@ -54,6 +54,7 @@ export const authApi = {
         notification_new_favorites?: boolean;
         notification_download_activity?: boolean;
         notification_weekly_summary?: boolean;
+        notification_email?: string;
     }): Promise<LoginResponse['user']> => {
         const { data } = await api.patch<LoginResponse['user']>('/auth/profile', updates);
         return data;

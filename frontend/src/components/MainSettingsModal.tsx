@@ -12,6 +12,7 @@ interface MainSettingsModalProps {
         notification_new_favorites?: boolean;
         notification_download_activity?: boolean;
         notification_weekly_summary?: boolean;
+        notification_email?: string | null;
     };
 }
 
@@ -27,6 +28,7 @@ export default function MainSettingsModal({ onClose, currentUser }: MainSettings
         notification_new_favorites: currentUser.notification_new_favorites || false,
         notification_download_activity: currentUser.notification_download_activity || false,
         notification_weekly_summary: currentUser.notification_weekly_summary || false,
+        notification_email: currentUser.notification_email || '',
     });
     const [watermarkFile, setWatermarkFile] = useState<File | null>(null);
     const [watermarkPreview, setWatermarkPreview] = useState<string | null>(currentUser.watermark_logo_path);
@@ -65,6 +67,7 @@ export default function MainSettingsModal({ onClose, currentUser }: MainSettings
             data.notification_new_favorites = profileData.notification_new_favorites;
             data.notification_download_activity = profileData.notification_download_activity;
             data.notification_weekly_summary = profileData.notification_weekly_summary;
+            data.notification_email = profileData.notification_email;
 
             const updatedUser = await authApi.updateProfile(data);
 
@@ -225,6 +228,23 @@ export default function MainSettingsModal({ onClose, currentUser }: MainSettings
                             <div>
                                 <h3 className="text-lg font-serif font-medium text-neutral-900 mb-1">Notification Preferences</h3>
                                 <p className="text-sm text-neutral-500 font-sans mb-6">Choose what email notifications you'd like to receive.</p>
+
+                                <div className="mb-6">
+                                    <label className="block text-sm font-medium text-neutral-700 mb-2 font-sans">
+                                        <Mail className="w-4 h-4 inline mr-1" />
+                                        Notification Email
+                                    </label>
+                                    <input
+                                        type="email"
+                                        value={profileData.notification_email}
+                                        onChange={(e) => setProfileData({ ...profileData, notification_email: e.target.value })}
+                                        className="input-field"
+                                        placeholder={profileData.email}
+                                    />
+                                    <p className="text-xs text-neutral-500 mt-1">
+                                        Leave blank to use your account email ({profileData.email})
+                                    </p>
+                                </div>
 
                                 <div className="space-y-6">
                                     <div className="flex items-start gap-3">
