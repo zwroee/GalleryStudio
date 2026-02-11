@@ -14,4 +14,7 @@ export default defineConfig(({ mode }) => ({
             },
         },
     },
+    define: {
+        'import.meta.env.VITE_DEMO_MODE': JSON.stringify(mode === 'demo' ? 'true' : 'false')
+    }
 }));
