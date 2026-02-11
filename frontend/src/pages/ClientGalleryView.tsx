@@ -6,6 +6,7 @@ import { useClientStore } from '../store/clientStore';
 import type { GalleryWithPhotos, Photo } from '../types';
 import SlideshowViewer from '../components/SlideshowViewer';
 import DownloadPinModal from '../components/DownloadPinModal';
+import { getImageUrl } from '../utils/imageUtils';
 
 export default function ClientGalleryView() {
     const { id } = useParams<{ id: string }>();
@@ -154,7 +155,7 @@ export default function ClientGalleryView() {
                                 onClick={() => setSelectedPhoto(photo)}
                             >
                                 <img
-                                    src={`/storage/${id}/thumbnail/${photo.filename}`}
+                                    src={getImageUrl(id!, photo.filename, 'thumbnail')}
                                     alt={photo.filename}
                                     className="w-full h-full object-cover transition-transform group-hover:scale-105"
                                 />
@@ -203,7 +204,7 @@ export default function ClientGalleryView() {
                     </button>
 
                     <img
-                        src={`/storage/${id}/preview/${selectedPhoto.filename}`}
+                        src={getImageUrl(id!, selectedPhoto.filename, 'preview')}
                         alt={selectedPhoto.filename}
                         className="max-w-full max-h-full object-contain"
                     />

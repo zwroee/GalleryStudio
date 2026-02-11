@@ -5,6 +5,7 @@ import { galleryApi } from '../services/api';
 import type { GalleryWithPhotos } from '../types';
 import GallerySettingsModal from '../components/GallerySettingsModal';
 import { copyToClipboard } from '../utils/clipboard';
+import { getImageUrl } from '../utils/imageUtils';
 
 export default function GalleryManagement() {
     const { id } = useParams<{ id: string }>();
@@ -304,7 +305,7 @@ export default function GalleryManagement() {
                                         </button>
                                     </div>
                                     <img
-                                        src={`/storage/${gallery.id}/thumbnail/${photo.filename}`}
+                                        src={getImageUrl(gallery.id, photo.filename, 'thumbnail')}
                                         alt={photo.filename}
                                         className="w-full h-full object-cover"
                                     />

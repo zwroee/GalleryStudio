@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
+import { getImageUrl } from '../utils/imageUtils';
 
 interface SlideshowViewerProps {
     photos: any[];
@@ -70,7 +71,7 @@ export default function SlideshowViewer({ photos, startIndex, onClose }: Slidesh
             <div className="flex-1 flex items-center justify-center p-4 md:p-12 overflow-hidden">
                 <div className="relative max-w-full max-h-full flex items-center justify-center shadow-2xl">
                     <img
-                        src={`/storage/${currentPhoto?.gallery_id}/preview/${currentPhoto?.filename}`}
+                        src={getImageUrl(currentPhoto?.gallery_id, currentPhoto?.filename, 'preview')}
                         alt={currentPhoto?.filename}
                         className="max-w-full max-h-[85vh] object-contain"
                     />

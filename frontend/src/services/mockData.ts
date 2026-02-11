@@ -90,3 +90,20 @@ export const MOCK_GALLERY_WITH_PHOTOS: GalleryWithPhotos = {
         is_favorited: i % 3 === 0 // Some favorites
     })) as Photo[]
 };
+
+export const MOCK_PORTFOLIO_IMAGES = Array.from({ length: 8 }).map((_, i) => ({
+    id: `portfolio-${i}`,
+    url: `https://picsum.photos/800/800?random=${i}`,
+    category: i % 2 === 0 ? 'WEDDING' : 'FAMILY',
+    width: 800,
+    height: 800,
+    created_at: new Date().toISOString()
+}));
+
+export const MOCK_PORTFOLIO_PROFILE = {
+    business_name: 'Gallery Studio Demo',
+    website: 'https://gallerystudio.demo',
+    phone: '555-0123',
+    email: 'demo@gallerystudio.com',
+    profile_picture_path: 'demo/profile.jpg'
+};

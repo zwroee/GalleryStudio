@@ -1,20 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import axios from 'axios';
-
-// Configure Axios
-const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || '/api',
-});
-
-// Add auth token to requests
-api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-});
+import api from '../services/api';
 
 export interface PortfolioImage {
     id: string;

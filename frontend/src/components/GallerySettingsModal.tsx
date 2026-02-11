@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { X, Lock, Download, Heart, Calendar, Save, Eye, EyeOff, Upload, Image as ImageIcon, Trash2 } from 'lucide-react';
+import { getImageUrl } from '../utils/imageUtils';
 
 import { Gallery } from '../types';
 
@@ -112,7 +113,7 @@ export default function GallerySettingsModal({ onClose, onSave, gallery }: Galle
                                     {coverPreview ? (
                                         <div className="relative group w-32 h-32 rounded-sm overflow-hidden border border-neutral-200">
                                             <img
-                                                src={coverPreview?.startsWith('data:') ? coverPreview : `/storage/${coverPreview}`}
+                                                src={coverPreview?.startsWith('data:') ? coverPreview : getImageUrl(gallery.id, coverPreview!, 'preview')} // Using preview size for cover typically or we might want a 'cover' type
                                                 alt="Cover preview"
                                                 className="w-full h-full object-cover"
                                             />

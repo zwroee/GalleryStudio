@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/authStore';
 import useScrollAnimation from './hooks/useScrollAnimation';
 
@@ -15,11 +15,15 @@ function AnimationWrapper() {
     return null;
 }
 
+// Check for demo mode
+const isDemo = import.meta.env.VITE_DEMO_MODE === 'true';
+const Router = isDemo ? HashRouter : BrowserRouter;
+
 function App() {
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
     return (
-        <BrowserRouter>
+        <Router>
             <AnimationWrapper />
             <Routes>
                 {/* Gallery Studio Routes */}
@@ -36,7 +40,7 @@ function App() {
                 <Route path="/gallery/:id" element={<ClientGalleryView />} />
                 <Route path="/gallery-studio/portfolio" element={<PortfolioPage />} />
             </Routes>
-        </BrowserRouter>
+        </Router>
     );
 }
 

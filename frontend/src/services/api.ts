@@ -27,7 +27,41 @@ api.interceptors.request.use((config) => {
 
 // Demo Mode Check
 const isDemo = import.meta.env.VITE_DEMO_MODE === 'true';
-import { MOCK_USER, MOCK_GALLERIES, MOCK_GALLERY_WITH_PHOTOS } from './mockData';
+import { MOCK_USER, MOCK_GALLERIES, MOCK_GALLERY_WITH_PHOTOS, MOCK_PORTFOLIO_IMAGES, MOCK_PORTFOLIO_PROFILE } from './mockData';
+
+// Mock Adapter for Demo Mode (Simple interception)
+if (isDemo) {
+    // We can't easily mock axios instance directly without a library like axios-mock-adapter,
+    // but since we control the API calls, we can just intercept the specific endpoints if we were using a library.
+    // However, our `api.ts` exports wrapper objects (`authApi`, `galleryApi`), which we are already mocking.
+    // BUT `portfolioStore` uses `api.get('/portfolio')` directly.
+    // So we need to mock the `api` instance methods or use an interceptor that throws a mock response.
+
+    const originalGet = api.get;
+    api.get = async (url: string, config?: any) => {
+        if (url === '/portfolio') {
+            return {
+                data: {
+                    images: MOCK_PORTFOLIO_IMAGES,
+                    profile: MOCK_PORTFOLIO_PROFILE
+                }
+            } as any;
+        }
+        if (url === '/client/galleries') {
+            return { data: { galleries: MOCK_GALLERIES.filter(g => g.is_public) } } as any;
+        }
+        if (url.startsWith('/client/galleries/')) {
+            if (url.includes('/favorites')) return { data: { favorites: [] } } as any;
+            // Single gallery
+            const id = url.split('/')[3];
+            const gallery = MOCK_GALLERIES.find(g => g.id === id) || MOCK_GALLERIES[0];
+            return { data: { gallery: { ...MOCK_GALLERY_WITH_PHOTOS, ...gallery } } } as any;
+        }
+        return originalGet(url, config);
+    };
+
+    // We should also mock post/put/delete if needed, but for demo viewing, get is most important.
+}
 
 // Auth API
 export const authApi = {
